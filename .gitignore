@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build and test output
+dist/
+coverage/
+*.tsbuildinfo
+
+# Expo / React Native
+.expo/
+apps/mobile/ios/
+apps/mobile/android/
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+
+# Cloudflare
+.wrangler/
+.dev.vars*
+!.dev.vars.example
+
+# Environment and secrets — never commit these
+.env
+.env.*
+!.env.example
+*service-account*.json
+credentials.json
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS / editors
+.DS_Store
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
