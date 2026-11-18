@@ -8,6 +8,7 @@ import type { HorizonAccount } from "./types";
 // Real responses from horizon-testnet.stellar.org (2026-11-18) for a 2-of-3
 // vault created with the Stellar CLI. Testnet resets may remove the account.
 import accountsBySigner from "./__fixtures__/accounts-by-signer.json";
+import root from "./__fixtures__/root.json";
 import vaultAccount from "./__fixtures__/vault-account.json";
 
 const VAULT = "GDDTBEBLVLD32OEMRUEXH7KEHYK5VRVN6ZXAJF7NIWMUG3ATUGTCNLOL";
@@ -196,5 +197,29 @@ describe("findAccountsBySigner / discoverVaults", () => {
     const network = { ...TESTNET, horizonUrl: "https://horizon.example/" };
     await createHorizonClient({ network, fetch }).findAccountsBySigner(ALEX);
     expect(fetch.mock.calls[0]?.[0]).toMatch(/^https:\/\/horizon\.example\/accounts\?/);
+  });
+});
+
+describe("getNetworkStatus", () => {
+  it("reports a healthy testnet (real fixture)", async () => {
+    const fetch = mockFetch(json(root));
+    const status = await createHorizonClient({ network: TESTNET, fetch }).getNetworkStatus();
+    expect(fetch.mock.calls[0]?.[0]).toBe("https://horizon-testnet.stellar.org/");
+    expect(status).toEqual({
+      ok: true,
+      passphraseMatches: true,
+      latestLedger: root.history_latest_ledger,
+      latestLedgerClosedAt: new Date(root.history_latest_ledger_closed_at),
+      protocolVersion: root.current_protocol_version,
+    });
+  });
+
+  it("flags a Horizon server on a different network", async () => {
+    const other = { ...root, network_passphrase: "Public Global Stellar Network ; September 2015" };
+    const status = await createHorizonClient({
+      network: TESTNET,
+      fetch: mockFetch(json(other)),
+    }).getNetworkStatus();
+    expect(status).toMatchObject({ ok: false, passphraseMatches: false });
   });
 });

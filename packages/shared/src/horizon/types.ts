@@ -51,3 +51,13 @@ export interface HorizonProblem {
   detail?: string;
   extras?: Record<string, unknown>;
 }
+
+/** `GET /` — Horizon server info. */
+export interface HorizonRoot {
+  network_passphrase: string;
+  history_latest_ledger: number;
+  history_latest_ledger_closed_at: string;
+  current_protocol_version: number;
+  horizon_version?: string;
+  core_version?: string;
+}
