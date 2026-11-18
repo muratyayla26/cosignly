@@ -1,0 +1,14 @@
+# Pinned versions
+
+Critical tool and package versions. Update this file in the same PR that changes a version.
+
+| Tool / package | Version | Where | Notes |
+|---|---|---|---|
+| Node.js | 24 (LTS) | `.nvmrc`, CI | |
+| pnpm | 12.15.0 | `package.json` `packageManager` | `pnpm ci` is a built-in pnpm command — the repo script is `pnpm check` |
+| TypeScript | ~6.0.3 | root | TypeScript 7 is not yet supported by `typescript-eslint` 8.x (peer `<6.1.0`); Expo SDK 58 templates use `~6.0.3` |
+| ESLint | ^10.15.0 | root | Flat config (`eslint.config.mjs`) |
+| typescript-eslint | ^8.73.0 | root | |
+| Prettier | ^3.10.1 | root | Markdown is excluded (hand-written docs) |
+| Vitest | ^5.1.1 | `packages/shared` | |
+| GitHub Actions | checkout v7, setup-node v7, pnpm/action-setup v6 | `.github/workflows/ci.yml` | |
