@@ -1,6 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    // Shared code runs in React Native, Cloudflare Workers and Node (tests).
+    // "DOM" provides the standard fetch / Response / AbortSignal types they all implement.
+    "lib": ["ES2022", "DOM"],
     "types": []
   },
   "include": ["src", "vitest.config.ts"]

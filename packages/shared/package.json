@@ -12,12 +12,15 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.1.1",
     "vitest": "^5.1.1"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "17.4.0"
   }
 }
