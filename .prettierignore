@@ -1,0 +1,12 @@
+node_modules
+pnpm-lock.yaml
+coverage
+dist
+.expo
+.wrangler
+ios
+android
+assets/brand
+
+# Markdown is hand-written; keep authors' formatting.
+*.md
