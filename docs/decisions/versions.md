@@ -10,5 +10,6 @@ Critical tool and package versions. Update this file in the same PR that changes
 | ESLint | ^10.15.0 | root | Flat config (`eslint.config.mjs`) |
 | typescript-eslint | ^8.73.0 | root | |
 | Prettier | ^3.10.1 | root | Markdown is excluded (hand-written docs) |
-| Vitest | ^5.1.1 | `packages/shared` | |
+| Vitest | ^5.1.1 | `packages/shared` | Coverage via `@vitest/coverage-v8`; vault rules ≥ 90% enforced |
+| @stellar/stellar-sdk | 17.4.0 (exact) | `packages/shared` | Use the `@stellar/stellar-sdk/base` entry. `@stellar/stellar-base` is deprecated (merged into the SDK) |
 | GitHub Actions | checkout v7, setup-node v7, pnpm/action-setup v6 | `.github/workflows/ci.yml` | |
