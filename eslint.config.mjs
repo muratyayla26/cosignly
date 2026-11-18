@@ -28,5 +28,10 @@ export default tseslint.config(
       "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
+  {
+    // Tests may print diagnostic output.
+    files: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: { "no-console": "off" },
+  },
   prettier,
 );
