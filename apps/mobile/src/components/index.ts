@@ -10,3 +10,5 @@ export { Text, type TextProps } from "./Text";
 export { SegmentedControl, type SegmentedControlProps } from "./SegmentedControl";
 export { QrCode, type QrCodeProps } from "./QrCode";
 export { TextField, type TextFieldProps } from "./TextField";
+export { ThresholdSummary, type ThresholdSummaryProps } from "./ThresholdSummary";
+export { VaultCard, type VaultCardProps } from "./VaultCard";

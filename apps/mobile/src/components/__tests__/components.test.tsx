@@ -17,6 +17,7 @@ import {
   StatusBadge,
   Text,
   TextField,
+  ThresholdSummary,
 } from "..";
 import { qrPath } from "../QrCode";
 
@@ -199,5 +200,26 @@ describe("TextField", () => {
     await renderThemed(<TextField label="Secret key" value="" error="Enter your secret key." />);
     expect(screen.getByLabelText("Secret key")).toBeTruthy();
     expect(screen.getByText("Enter your secret key.")).toBeTruthy();
+  });
+});
+
+describe("ThresholdSummary", () => {
+  const signers = [
+    { key: "GCFA5GKYNJDLCLHLGJMYKBASQ2JNN43T67MS6GALL6CGKEPMSELOORJ7", weight: 1 },
+    { key: "GDGKPPMM5BORTIJLY2IC2OCU33OACYDRHMOUJAFRXHY4GTYOJD2QT4CY", weight: 1 },
+  ];
+
+  it("states payment and admin rules separately", async () => {
+    const config = { signers, masterWeight: 0, thresholds: { low: 1, medium: 1, high: 2 } };
+    await renderThemed(<ThresholdSummary config={config} showIssues={false} />);
+    expect(screen.getByText("Payments need 1 of 2")).toBeTruthy();
+    expect(screen.getByText("Changing signers needs 2 of 2")).toBeTruthy();
+  });
+
+  it("warns when losing one signer would lock the vault (2 of 2)", async () => {
+    const config = { signers, masterWeight: 0, thresholds: { low: 2, medium: 2, high: 2 } };
+    await renderThemed(<ThresholdSummary config={config} />);
+    expect(screen.getByRole("alert")).toBeTruthy();
+    expect(screen.getByText(/If one signer loses their key/)).toBeTruthy();
   });
 });
