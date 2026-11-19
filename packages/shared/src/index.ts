@@ -14,3 +14,4 @@ export * from "./horizon/client";
 export * from "./coordinator/types";
 export * from "./format";
 export * from "./selfcheck";
+export * from "./keys";
