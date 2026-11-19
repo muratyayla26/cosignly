@@ -9,21 +9,26 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
+import { SignerProvider, useSigner } from "@/signer";
 import { fonts, ThemeProvider, useTheme } from "@/theme";
 
-// Keep the native splash up until fonts and the stored theme choice are ready (no flash).
+// Keep the native splash up until fonts, the stored theme choice and the signer
+// state are ready (no flash, no glimpse of the wrong first screen).
 void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <RootStack />
+      <SignerProvider>
+        <RootStack />
+      </SignerProvider>
     </ThemeProvider>
   );
 }
 
 function RootStack() {
   const { colors, scheme, ready } = useTheme();
+  const { state: signer } = useSigner();
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -31,7 +36,7 @@ function RootStack() {
     Inter_700Bold,
   });
   // A font error should not block the app; system font is the fallback.
-  const loaded = ready && (fontsLoaded || fontError !== null);
+  const loaded = ready && signer.status !== "loading" && (fontsLoaded || fontError !== null);
 
   useEffect(() => {
     if (loaded) void SplashScreen.hideAsync();
@@ -52,7 +57,15 @@ function RootStack() {
         }}
       >
         <Stack.Screen name="index" options={{ title: "Cosignly", headerShown: false }} />
+        <Stack.Screen name="settings" options={{ title: "Settings" }} />
         <Stack.Screen name="design" options={{ title: "Design preview" }} />
+        <Stack.Screen name="onboarding/index" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding/recovery" options={{ title: "" }} />
+        <Stack.Screen name="onboarding/import" options={{ title: "Use an existing key" }} />
+        <Stack.Screen
+          name="onboarding/ready"
+          options={{ headerShown: false, gestureEnabled: false }}
+        />
       </Stack>
     </>
   );

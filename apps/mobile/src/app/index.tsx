@@ -1,22 +1,26 @@
 import { cryptoSelfCheck } from "@cosignly/shared";
-import { router } from "expo-router";
-import { Globe, Palette, ShieldAlert, ShieldCheck } from "lucide-react-native";
+import { Redirect, router } from "expo-router";
+import { Globe, Palette, Settings, ShieldAlert, ShieldCheck } from "lucide-react-native";
 import { useMemo } from "react";
-import { Image, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Banner, Button, Card, Icon, Text } from "@/components";
+import { AddressChip, Banner, Button, Card, Icon, Text } from "@/components";
 import { brandImages, LOCKUP_STACKED_RATIO } from "@/lib/brand";
 import { network } from "@/lib/stellar";
 import { timeAgo } from "@/lib/time";
 import { useNetworkStatus, type NetworkState } from "@/lib/useNetworkStatus";
-import { screenPadding, space, useTheme } from "@/theme";
+import { useSigner } from "@/signer";
+import { minTouchTarget, screenPadding, space, useTheme } from "@/theme";
 
 export default function HomeScreen() {
   const { colors, scheme } = useTheme();
   const { state, refreshing, refresh } = useNetworkStatus();
   // Runs once per launch: proves secure randomness + Ed25519 work on this device.
   const selfCheck = useMemo(() => cryptoSelfCheck(), []);
+  const { state: signer } = useSigner();
+
+  if (signer.status === "none") return <Redirect href="/onboarding" />;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={["top"]}>
@@ -26,6 +30,17 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.primary} />
         }
       >
+        <View style={styles.topBar}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Settings"
+            hitSlop={space.xs}
+            onPress={() => router.push("/settings")}
+            style={styles.iconButton}
+          >
+            <Icon icon={Settings} color="primary" size="md" />
+          </Pressable>
+        </View>
         <View style={styles.hero}>
           <Image
             source={brandImages.lockupStacked[scheme]}
@@ -37,6 +52,13 @@ export default function HomeScreen() {
             Shared approvals for Stellar vaults
           </Text>
         </View>
+
+        {signer.status === "ready" ? (
+          <Card>
+            <Text variant="heading">Your signer key</Text>
+            <AddressChip address={signer.publicKey} name="You" />
+          </Card>
+        ) : null}
 
         <Card>
           <Text variant="heading">Network</Text>
@@ -119,7 +141,14 @@ function NetworkRow({ state }: { state: NetworkState }) {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   content: { padding: screenPadding, gap: space.md },
-  hero: { alignItems: "center", gap: space.xs, paddingVertical: space.xl },
+  topBar: { flexDirection: "row", justifyContent: "flex-end" },
+  iconButton: {
+    minWidth: minTouchTarget,
+    minHeight: minTouchTarget,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  hero: { alignItems: "center", gap: space.xs, paddingBottom: space.xl },
   lockup: { width: 160, height: 160 / LOCKUP_STACKED_RATIO },
   row: { flexDirection: "row", alignItems: "center", gap: space.xs },
   networkRows: { gap: space.xxs },
