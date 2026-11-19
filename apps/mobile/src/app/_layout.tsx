@@ -53,6 +53,8 @@ function RootStack() {
           headerTintColor: colors.primary,
           headerTitleStyle: { fontFamily: fonts.semibold, color: colors.text },
           headerShadowVisible: false,
+          // Back button shows only the chevron, never the previous screen's title.
+          headerBackButtonDisplayMode: "minimal",
           contentStyle: { backgroundColor: colors.bg },
         }}
       >
