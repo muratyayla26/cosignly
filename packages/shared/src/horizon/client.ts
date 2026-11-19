@@ -3,9 +3,11 @@ import { StrKey } from "@stellar/stellar-sdk/base";
 import type { AssetRef } from "../assets";
 import type { NetworkConfig } from "../network";
 import type { Thresholds, Vault, VaultSigner } from "../vault/types";
+import { describeOperation, type VaultActivity } from "./activity";
 import type {
   HorizonAccount,
   HorizonBalance,
+  HorizonOperation,
   HorizonPage,
   HorizonProblem,
   HorizonRoot,
@@ -18,6 +20,8 @@ export interface Balance {
   balance: string;
   /** Trustline limit; absent for XLM. */
   limit?: string;
+  /** Amount locked in open offers (cannot be sent). */
+  sellingLiabilities?: string;
 }
 
 /** A Horizon account normalized for Cosignly. */
@@ -26,6 +30,9 @@ export interface AccountInfo {
   sequence: string;
   /** Signers, trustlines and other entries; each raises the minimum XLM balance. */
   subentryCount: number;
+  /** Reserves this account pays for others / others pay for it (sponsorship). */
+  numSponsoring: number;
+  numSponsored: number;
   thresholds: Thresholds;
   /** Weight of the account's own key (0 = turned off). */
   masterWeight: number;
@@ -86,6 +93,13 @@ export interface HorizonClient {
   findAccountsBySigner(signer: string, options?: FindBySignerOptions): Promise<AccountInfo[]>;
   /** Vaults the signer key can approve for: accounts that list it, excluding the key's own account. */
   discoverVaults(signer: string, options?: FindBySignerOptions): Promise<Vault[]>;
+  /** Latest successful operations on an account, newest first, in plain language. `[]` if the account does not exist. */
+  getActivity(accountId: string, options?: ActivityOptions): Promise<VaultActivity[]>;
+}
+
+export interface ActivityOptions extends RequestOptions {
+  /** How many operations, 1-200. Default 10. */
+  limit?: number;
 }
 
 const MAX_PAGE_SIZE = 200;
@@ -153,7 +167,22 @@ export function createHorizonClient({
     return accounts.filter((a) => a.id !== signer).map(toVault);
   }
 
-  return { getNetworkStatus, getAccount, findAccountsBySigner, discoverVaults };
+  async function getActivity(accountId: string, options: ActivityOptions = {}) {
+    assertPublicKey(accountId);
+    const limit = Math.min(Math.max(options.limit ?? 10, 1), MAX_PAGE_SIZE);
+    try {
+      const body = await getJson<HorizonPage<HorizonOperation>>(
+        `${base}/accounts/${accountId}/operations?order=desc&limit=${limit}`,
+        options,
+      );
+      return body._embedded.records.map((op) => describeOperation(accountId, op));
+    } catch (e) {
+      if (e instanceof HorizonError && e.status === 404) return [];
+      throw e;
+    }
+  }
+
+  return { getNetworkStatus, getAccount, findAccountsBySigner, discoverVaults, getActivity };
 }
 
 export function toAccountInfo(raw: HorizonAccount): AccountInfo {
@@ -163,6 +192,8 @@ export function toAccountInfo(raw: HorizonAccount): AccountInfo {
     id: raw.id,
     sequence: raw.sequence,
     subentryCount: raw.subentry_count,
+    numSponsoring: raw.num_sponsoring ?? 0,
+    numSponsored: raw.num_sponsored ?? 0,
     thresholds: {
       low: raw.thresholds.low_threshold,
       medium: raw.thresholds.med_threshold,
@@ -188,13 +219,18 @@ export function toVault(account: AccountInfo): Vault {
 }
 
 function toBalance(raw: HorizonBalance): Balance[] {
-  if (raw.asset_type === "native") return [{ asset: { type: "native" }, balance: raw.balance }];
+  const liabilities =
+    raw.selling_liabilities !== undefined ? { sellingLiabilities: raw.selling_liabilities } : {};
+  if (raw.asset_type === "native") {
+    return [{ asset: { type: "native" }, balance: raw.balance, ...liabilities }];
+  }
   if (raw.asset_type === "liquidity_pool_shares" || !raw.asset_code || !raw.asset_issuer) return [];
   return [
     {
       asset: { type: "credit", code: raw.asset_code, issuer: raw.asset_issuer },
       balance: raw.balance,
       ...(raw.limit !== undefined ? { limit: raw.limit } : {}),
+      ...liabilities,
     },
   ];
 }

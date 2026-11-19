@@ -15,3 +15,6 @@ export * from "./coordinator/types";
 export * from "./format";
 export * from "./selfcheck";
 export * from "./keys";
+export * from "./amount";
+export * from "./vault/reserve";
+export * from "./horizon/activity";
