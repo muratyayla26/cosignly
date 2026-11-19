@@ -2,12 +2,7 @@ packages:
   - apps/*
   - packages/*
 
-# Expo / Metro resolve dependencies most reliably from a flat node_modules.
-# Revisit in W1.3 once the Expo app is in the workspace.
-minimumReleaseAgeExclude:
-  - "@vitest/coverage-v8@5.1.1"
-  - "@vitest/mocker@5.1.1"
-  - "@vitest/spy@5.1.1"
-  - vitest@5.1.1
-
-nodeLinker: hoisted
+# Dependency install scripts must be approved explicitly (pnpm 12 default).
+# @parcel/watcher (via Jest) ships prebuilt binaries; its script only builds from source.
+allowBuilds:
+  "@parcel/watcher": false

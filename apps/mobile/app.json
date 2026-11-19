@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "Cosignly",
+    "slug": "cosignly",
+    "owner": "muratyayla26",
+    "scheme": "cosignly",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "primaryColor": "#4B4CE0",
+    "icon": "../../assets/brand/icon-1024.png",
+    "ios": {
+      "bundleIdentifier": "com.muratyayla.cosignly",
+      "appleTeamId": "LB743V5W75",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.muratyayla.cosignly",
+      "adaptiveIcon": {
+        "foregroundImage": "../../assets/brand/adaptive-icon-foreground.png",
+        "monochromeImage": "../../assets/brand/adaptive-icon-monochrome.png",
+        "backgroundColor": "#0B1020"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "../../assets/brand/splash-icon-light.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#F5F7FB",
+          "dark": {
+            "image": "../../assets/brand/splash-icon-dark.png",
+            "backgroundColor": "#0B1020"
+          }
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6d9cdfa2-4667-452a-8f94-ea30dbf8d40a"
+      }
+    }
+  }
+}

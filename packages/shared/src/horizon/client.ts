@@ -8,6 +8,7 @@ import type {
   HorizonBalance,
   HorizonPage,
   HorizonProblem,
+  HorizonRoot,
   HorizonSigner,
 } from "./types";
 
@@ -64,7 +65,21 @@ export interface FindBySignerOptions extends RequestOptions {
   maxPages?: number;
 }
 
+/** Reachability and freshness of the Horizon server, for the app's network indicator. */
+export interface NetworkStatus {
+  /** Horizon answered and serves the expected network. */
+  ok: boolean;
+  /** `false` when Horizon serves a different network than configured (misconfiguration). */
+  passphraseMatches: boolean;
+  latestLedger: number;
+  /** When the latest ledger closed, per Horizon. */
+  latestLedgerClosedAt: Date;
+  protocolVersion: number;
+}
+
 export interface HorizonClient {
+  /** Checks that Horizon is reachable and on the configured network. Throws on network errors. */
+  getNetworkStatus(options?: RequestOptions): Promise<NetworkStatus>;
   /** Loads an account, or returns `null` if it does not exist (not funded yet, or removed by a testnet reset). */
   getAccount(accountId: string, options?: RequestOptions): Promise<AccountInfo | null>;
   /** All accounts that list `signer` as a signer with weight > 0. */
@@ -91,6 +106,18 @@ export function createHorizonClient({
       throw new HorizonError(response.status, await readProblem(response));
     }
     return (await response.json()) as T;
+  }
+
+  async function getNetworkStatus(options?: RequestOptions): Promise<NetworkStatus> {
+    const root = await getJson<HorizonRoot>(`${base}/`, options);
+    const passphraseMatches = root.network_passphrase === network.passphrase;
+    return {
+      ok: passphraseMatches,
+      passphraseMatches,
+      latestLedger: root.history_latest_ledger,
+      latestLedgerClosedAt: new Date(root.history_latest_ledger_closed_at),
+      protocolVersion: root.current_protocol_version,
+    };
   }
 
   async function getAccount(accountId: string, options?: RequestOptions) {
@@ -126,7 +153,7 @@ export function createHorizonClient({
     return accounts.filter((a) => a.id !== signer).map(toVault);
   }
 
-  return { getAccount, findAccountsBySigner, discoverVaults };
+  return { getNetworkStatus, getAccount, findAccountsBySigner, discoverVaults };
 }
 
 export function toAccountInfo(raw: HorizonAccount): AccountInfo {
