@@ -8,10 +8,10 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from "react-na
 import { Banner, Button, Text, TextField } from "@/components";
 import {
   biometricName,
-  signerErrorKind,
-  signerKeyErrorMessage,
+  SignerErrorBanner,
+  toSignerError,
   useSigner,
-  type SignerKeyErrorKind,
+  type SignerKeyError,
 } from "@/signer";
 import { screenPadding, space } from "@/theme";
 
@@ -20,7 +20,7 @@ export default function ImportKeyScreen() {
   const { importKey } = useSigner();
   const [secret, setSecret] = useState("");
   const [inputError, setInputError] = useState<string | null>(null);
-  const [storeError, setStoreError] = useState<SignerKeyErrorKind | null>(null);
+  const [storeError, setStoreError] = useState<SignerKeyError | null>(null);
   const [busy, setBusy] = useState(false);
 
   const paste = async () => {
@@ -45,7 +45,7 @@ export default function ImportKeyScreen() {
       setSecret("");
       router.replace("/onboarding/ready");
     } catch (e) {
-      setStoreError(signerErrorKind(e));
+      setStoreError(toSignerError(e));
     } finally {
       setBusy(false);
     }
@@ -96,12 +96,7 @@ export default function ImportKeyScreen() {
           message="Anyone with this key can sign for your vaults. Cosignly will never ask you for it again, and never sends it anywhere."
         />
 
-        {storeError ? (
-          <Banner
-            tone={storeError === "cancelled" ? "info" : "danger"}
-            {...signerKeyErrorMessage(storeError)}
-          />
-        ) : null}
+        {storeError ? <SignerErrorBanner error={storeError} /> : null}
 
         <Button
           label="Use this key"

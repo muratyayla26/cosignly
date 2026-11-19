@@ -13,10 +13,11 @@ import { Banner, Button, Card, Icon, Text } from "@/components";
 import {
   biometricName,
   canProtectWithBiometrics,
-  signerErrorKind,
+  SignerErrorBanner,
   signerKeyErrorMessage,
+  toSignerError,
   useSigner,
-  type SignerKeyErrorKind,
+  type SignerKeyError,
 } from "@/signer";
 import { screenPadding, space } from "@/theme";
 
@@ -45,7 +46,7 @@ export default function RecoveryScreen() {
   const isImport = next === "import";
   const { createKey } = useSigner();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<SignerKeyErrorKind | null>(null);
+  const [error, setError] = useState<SignerKeyError | null>(null);
   const biometricsReady = canProtectWithBiometrics();
 
   const onContinue = async () => {
@@ -59,13 +60,11 @@ export default function RecoveryScreen() {
       await createKey();
       router.replace("/onboarding/ready");
     } catch (e) {
-      setError(signerErrorKind(e));
+      setError(toSignerError(e));
     } finally {
       setBusy(false);
     }
   };
-
-  const errorText = error ? signerKeyErrorMessage(error) : null;
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -102,9 +101,7 @@ export default function RecoveryScreen() {
       {!biometricsReady ? (
         <Banner {...signerKeyErrorMessage("biometrics-unavailable")} tone="warning" />
       ) : null}
-      {errorText ? (
-        <Banner tone={error === "cancelled" ? "info" : "danger"} {...errorText} />
-      ) : null}
+      {error ? <SignerErrorBanner error={error} /> : null}
 
       <Button
         label={isImport ? "I understand, continue" : "I understand, create my key"}

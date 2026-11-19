@@ -64,6 +64,19 @@ describe("Recovery screen", () => {
     expect(router.replace).not.toHaveBeenCalled();
   });
 
+  it("shows the native reason in dev builds", async () => {
+    mockParams = { next: "create" };
+    jest
+      .mocked(keyStore.saveSignerKey)
+      .mockRejectedValueOnce(
+        new SignerKeyError("failed", "You must set `NSFaceIDUsageDescription`"),
+      );
+    await renderApp(<RecoveryScreen />);
+    await fireEvent.press(screen.getByRole("button", { name: "I understand, create my key" }));
+    expect(screen.getByText("Something went wrong")).toBeTruthy();
+    expect(screen.getByText(/Details \(dev only\): You must set/)).toBeTruthy();
+  });
+
   it("blocks key creation when biometrics are not set up", async () => {
     mockParams = { next: "create" };
     jest.mocked(keyStore.canProtectWithBiometrics).mockReturnValue(false);

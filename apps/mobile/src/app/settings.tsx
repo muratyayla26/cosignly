@@ -8,10 +8,10 @@ import { AddressChip, Banner, Button, Card, QrCode, SegmentedControl, Text } fro
 import { network } from "@/lib/stellar";
 import {
   biometricName,
-  signerErrorKind,
-  signerKeyErrorMessage,
+  SignerErrorBanner,
+  toSignerError,
   useSigner,
-  type SignerKeyErrorKind,
+  type SignerKeyError,
 } from "@/signer";
 import { screenPadding, space, useTheme, type AppearancePreference } from "@/theme";
 
@@ -21,7 +21,7 @@ const APPEARANCE_OPTIONS = [
   { value: "dark", label: "Dark" },
 ] as const satisfies readonly { value: AppearancePreference; label: string }[];
 
-type UnlockResult = { kind: "ok" } | { kind: "error"; error: SignerKeyErrorKind };
+type UnlockResult = { kind: "ok" } | { kind: "error"; error: SignerKeyError };
 
 export default function SettingsScreen() {
   const { preference, setPreference } = useTheme();
@@ -40,7 +40,7 @@ export default function SettingsScreen() {
       await unlock("Unlock your Cosignly signer key", () => undefined);
       setResult({ kind: "ok" });
     } catch (e) {
-      setResult({ kind: "error", error: signerErrorKind(e) });
+      setResult({ kind: "error", error: toSignerError(e) });
     } finally {
       setChecking(false);
     }
@@ -95,12 +95,7 @@ export default function SettingsScreen() {
               message="It unlocked and matches your public address."
             />
           ) : null}
-          {result?.kind === "error" ? (
-            <Banner
-              tone={result.error === "cancelled" ? "info" : "danger"}
-              {...signerKeyErrorMessage(result.error)}
-            />
-          ) : null}
+          {result?.kind === "error" ? <SignerErrorBanner error={result.error} /> : null}
         </Card>
       </Section>
 

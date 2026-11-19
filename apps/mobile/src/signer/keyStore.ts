@@ -46,7 +46,14 @@ export type SignerKeyErrorKind =
   | "failed";
 
 export class SignerKeyError extends Error {
-  constructor(readonly kind: SignerKeyErrorKind) {
+  constructor(
+    readonly kind: SignerKeyErrorKind,
+    /**
+     * The native error text, shown only in development builds to diagnose setup
+     * problems. Native SecureStore errors describe the failure, never the value.
+     */
+    readonly detail?: string,
+  ) {
     super(`Signer key error: ${kind}`);
     this.name = "SignerKeyError";
   }
@@ -55,17 +62,18 @@ export class SignerKeyError extends Error {
 /** Maps native SecureStore errors to a kind without keeping their text. */
 function toSignerKeyError(e: unknown): SignerKeyError {
   if (e instanceof SignerKeyError) return e;
-  const message = e instanceof Error ? e.message.toLowerCase() : "";
-  if (message.includes("cancel")) return new SignerKeyError("cancelled");
+  const detail = e instanceof Error ? e.message : undefined;
+  const message = detail?.toLowerCase() ?? "";
+  if (message.includes("cancel")) return new SignerKeyError("cancelled", detail);
   if (
     message.includes("enrolled") ||
     message.includes("no hardware") ||
     message.includes("unsupported") ||
     message.includes("passcode")
   ) {
-    return new SignerKeyError("biometrics-unavailable");
+    return new SignerKeyError("biometrics-unavailable", detail);
   }
-  return new SignerKeyError("failed");
+  return new SignerKeyError("failed", detail);
 }
 
 /** Whether this device can store a key behind Face ID / fingerprint. */

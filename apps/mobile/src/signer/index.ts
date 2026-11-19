@@ -11,4 +11,5 @@ export {
   type Signer,
   type SignerState,
 } from "./SignerProvider";
-export { biometricName, signerErrorKind } from "./labels";
+export { biometricName, toSignerError } from "./labels";
+export { SignerErrorBanner } from "./SignerErrorBanner";

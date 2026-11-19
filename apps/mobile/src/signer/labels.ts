@@ -1,11 +1,11 @@
 import { Platform } from "react-native";
 
-import { SignerKeyError, type SignerKeyErrorKind } from "./keyStore";
+import { SignerKeyError } from "./keyStore";
 
 /** How the biometric check is called on this platform, for button labels and copy. */
 export const biometricName = Platform.OS === "ios" ? "Face ID" : "your fingerprint";
 
-/** The error kind of anything thrown by the signer key functions. */
-export function signerErrorKind(e: unknown): SignerKeyErrorKind {
-  return e instanceof SignerKeyError ? e.kind : "failed";
+/** Anything thrown by the signer key functions, as a `SignerKeyError`. */
+export function toSignerError(e: unknown): SignerKeyError {
+  return e instanceof SignerKeyError ? e : new SignerKeyError("failed");
 }
