@@ -61,3 +61,40 @@ export interface HorizonRoot {
   horizon_version?: string;
   core_version?: string;
 }
+
+/**
+ * `GET /accounts/{id}/operations` record. Only the fields Cosignly reads; the
+ * type-specific fields are optional because each operation type has its own.
+ */
+export interface HorizonOperation {
+  id: string;
+  paging_token: string;
+  transaction_successful: boolean;
+  source_account: string;
+  type: string;
+  created_at: string;
+  transaction_hash: string;
+  // payment, path_payment_*
+  from?: string;
+  to?: string;
+  amount?: string;
+  asset_type?: string;
+  asset_code?: string;
+  asset_issuer?: string;
+  // create_account
+  funder?: string;
+  account?: string;
+  starting_balance?: string;
+  // change_trust
+  limit?: string;
+  trustor?: string;
+  // set_options
+  signer_key?: string;
+  signer_weight?: number;
+  master_key_weight?: number;
+  low_threshold?: number;
+  med_threshold?: number;
+  high_threshold?: number;
+  // account_merge
+  into?: string;
+}

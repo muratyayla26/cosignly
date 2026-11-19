@@ -10,6 +10,7 @@ import type { HorizonAccount } from "./types";
 import accountsBySigner from "./__fixtures__/accounts-by-signer.json";
 import root from "./__fixtures__/root.json";
 import vaultAccount from "./__fixtures__/vault-account.json";
+import vaultOperations from "./__fixtures__/vault-operations.json";
 
 const VAULT = "GDDTBEBLVLD32OEMRUEXH7KEHYK5VRVN6ZXAJF7NIWMUG3ATUGTCNLOL";
 const ALEX = "GCFA5GKYNJDLCLHLGJMYKBASQ2JNN43T67MS6GALL6CGKEPMSELOORJ7";
@@ -54,9 +55,11 @@ describe("toAccountInfo (real vault fixture)", () => {
         asset: { type: "credit", code: "USDC", issuer: USDC_ISSUER },
         balance: "0.0000000",
         limit: "922337203685.4775807",
+        sellingLiabilities: "0.0000000",
       },
-      { asset: { type: "native" }, balance: expect.any(String) },
+      { asset: { type: "native" }, balance: expect.any(String), sellingLiabilities: "0.0000000" },
     ]);
+    expect(info).toMatchObject({ numSponsoring: 0, numSponsored: 0 });
   });
 
   it("produces a config that passes the lockout rules and reads as 2 of 3", () => {
@@ -221,5 +224,30 @@ describe("getNetworkStatus", () => {
       fetch: mockFetch(json(other)),
     }).getNetworkStatus();
     expect(status).toMatchObject({ ok: false, passphraseMatches: false });
+  });
+});
+
+describe("getActivity", () => {
+  it("reads the newest operations and describes them", async () => {
+    const fetch = mockFetch(json(vaultOperations));
+    const activity = await createHorizonClient({ network: TESTNET, fetch }).getActivity(VAULT, {
+      limit: 500,
+    });
+    expect(fetch.mock.calls[0]?.[0]).toBe(
+      `https://horizon-testnet.stellar.org/accounts/${VAULT}/operations?order=desc&limit=200`,
+    );
+    expect(activity[0]?.title).toBe("Received 25 XLM");
+  });
+
+  it("returns an empty list for an account that does not exist", async () => {
+    const fetch = mockFetch(json({ status: 404 }, 404));
+    expect(await createHorizonClient({ network: TESTNET, fetch }).getActivity(VAULT)).toEqual([]);
+  });
+
+  it("rethrows other errors", async () => {
+    const fetch = mockFetch(json({ status: 503, title: "Unavailable" }, 503));
+    await expect(
+      createHorizonClient({ network: TESTNET, fetch }).getActivity(VAULT),
+    ).rejects.toBeInstanceOf(HorizonError);
   });
 });

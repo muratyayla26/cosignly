@@ -60,6 +60,7 @@ function RootStack() {
       >
         <Stack.Screen name="index" options={{ title: "Cosignly", headerShown: false }} />
         <Stack.Screen name="settings" options={{ title: "Settings" }} />
+        <Stack.Screen name="vault/[id]" options={{ title: "Vault" }} />
         <Stack.Screen name="design" options={{ title: "Design preview" }} />
         <Stack.Screen name="onboarding/index" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding/recovery" options={{ title: "" }} />
