@@ -1,36 +1,68 @@
 import { cryptoSelfCheck } from "@cosignly/shared";
 import { Redirect, router } from "expo-router";
-import { Globe, Palette, Settings, ShieldAlert, ShieldCheck } from "lucide-react-native";
-import { useMemo } from "react";
-import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { Palette, QrCode as QrCodeIcon, Settings } from "lucide-react-native";
+import { useCallback, useMemo } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AddressChip, Banner, Button, Card, Icon, Text } from "@/components";
-import { brandImages, LOCKUP_STACKED_RATIO } from "@/lib/brand";
+import { Banner, Button, Card, Icon, Text, VaultCard } from "@/components";
+import { brandImages, LOCKUP_HORIZONTAL_RATIO } from "@/lib/brand";
 import { network } from "@/lib/stellar";
 import { timeAgo } from "@/lib/time";
-import { useNetworkStatus, type NetworkState } from "@/lib/useNetworkStatus";
+import { useNetworkStatus } from "@/lib/useNetworkStatus";
+import { useRemoteData } from "@/lib/useRemoteData";
 import { useSigner } from "@/signer";
 import { minTouchTarget, screenPadding, space, useTheme } from "@/theme";
+import { loadVaults, sortedBalances, vaultTitle } from "@/vaults/data";
 
+/** Home: the vaults this phone's signer key can approve for. */
 export default function HomeScreen() {
+  const { state: signer } = useSigner();
+  if (signer.status === "none") return <Redirect href="/onboarding" />;
+  if (signer.status !== "ready") return null;
+  return <VaultList publicKey={signer.publicKey} />;
+}
+
+function VaultList({ publicKey }: { publicKey: string }) {
   const { colors, scheme } = useTheme();
-  const { state, refreshing, refresh } = useNetworkStatus();
+  const net = useNetworkStatus();
+  const load = useCallback((signal: AbortSignal) => loadVaults(publicKey, signal), [publicKey]);
+  const vaults = useRemoteData(load);
   // Runs once per launch: proves secure randomness + Ed25519 work on this device.
   const selfCheck = useMemo(() => cryptoSelfCheck(), []);
-  const { state: signer } = useSigner();
 
-  if (signer.status === "none") return <Redirect href="/onboarding" />;
+  const onRefresh = () => {
+    void net.refresh();
+    void vaults.refresh();
+  };
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={["top"]}>
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.primary} />
+          <RefreshControl
+            refreshing={vaults.refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+          />
         }
       >
         <View style={styles.topBar}>
+          <Image
+            source={brandImages.lockupHorizontal[scheme]}
+            style={styles.lockup}
+            resizeMode="contain"
+            accessibilityLabel="Cosignly"
+          />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Settings"
@@ -41,54 +73,85 @@ export default function HomeScreen() {
             <Icon icon={Settings} color="primary" size="md" />
           </Pressable>
         </View>
-        <View style={styles.hero}>
-          <Image
-            source={brandImages.lockupStacked[scheme]}
-            style={styles.lockup}
-            resizeMode="contain"
-            accessibilityLabel="Cosignly"
+
+        {net.state.kind === "offline" ? (
+          <Banner
+            tone="warning"
+            title={`Can't reach Stellar ${network.label}`}
+            message="Check your internet connection and pull down to try again."
           />
-          <Text variant="callout" color="textMuted" align="center">
-            Shared approvals for Stellar vaults
-          </Text>
-        </View>
-
-        {signer.status === "ready" ? (
-          <Card>
-            <Text variant="heading">Your signer key</Text>
-            <AddressChip address={signer.publicKey} name="You" />
-          </Card>
         ) : null}
+        {net.state.kind === "wrong-network" ? (
+          <Banner
+            tone="danger"
+            title="Unexpected network"
+            message={`The server is not on Stellar ${network.label}. Cosignly will not use it.`}
+          />
+        ) : null}
+        {selfCheck.ok ? null : (
+          <Banner
+            tone="danger"
+            title="Secure signing is not available on this phone"
+            message={`Details: ${selfCheck.error ?? "unknown"}`}
+          />
+        )}
 
-        <Card>
-          <Text variant="heading">Network</Text>
-          <NetworkRow state={state} />
-        </Card>
+        <Text variant="title" accessibilityRole="header">
+          Your vaults
+        </Text>
 
-        <Card>
-          <Text variant="heading">This device</Text>
-          <View style={styles.row}>
-            <Icon
-              icon={selfCheck.ok ? ShieldCheck : ShieldAlert}
-              color={selfCheck.ok ? "success" : "danger"}
-            />
-            <Text variant="body" color={selfCheck.ok ? "success" : "danger"}>
-              {selfCheck.ok ? "Secure signing is available" : "Secure signing is not available"}
+        {vaults.state.kind === "loading" ? (
+          <View style={styles.center}>
+            <ActivityIndicator color={colors.primary} />
+            <Text variant="callout" color="textMuted">
+              Looking for vaults on Stellar {network.label}…
             </Text>
           </View>
-          {selfCheck.ok ? null : (
-            <Text variant="caption" color="textMuted">
-              Details: {selfCheck.error}
+        ) : null}
+
+        {vaults.state.kind === "error" ? (
+          <Banner
+            tone="warning"
+            title="Couldn't load your vaults"
+            message="Pull down to try again."
+          />
+        ) : null}
+
+        {vaults.state.kind === "ready" ? (
+          <>
+            {vaults.state.stale ? (
+              <Banner
+                tone="warning"
+                title="Showing saved results"
+                message="The latest update failed. Pull down to try again."
+              />
+            ) : null}
+            {vaults.state.data.length === 0 ? (
+              <EmptyState />
+            ) : (
+              vaults.state.data.map(({ vault, account }) => (
+                <VaultCard
+                  key={vault.accountId}
+                  title={vaultTitle(vault.accountId)}
+                  vault={vault}
+                  balances={sortedBalances(account.balances)}
+                  onPress={() =>
+                    router.push({ pathname: "/vault/[id]", params: { id: vault.accountId } })
+                  }
+                />
+              ))
+            )}
+            <Text variant="caption" color="textMuted" align="center">
+              Stellar {network.label} · updated {timeAgo(vaults.state.updatedAt)}
             </Text>
-          )}
-        </Card>
+          </>
+        ) : null}
 
         {__DEV__ ? (
           <Button
             label="Design preview"
             icon={Palette}
-            variant="secondary"
-            fullWidth
+            variant="ghost"
             onPress={() => router.push("/design")}
           />
         ) : null}
@@ -97,59 +160,35 @@ export default function HomeScreen() {
   );
 }
 
-function NetworkRow({ state }: { state: NetworkState }) {
-  switch (state.kind) {
-    case "loading":
-      return (
-        <Text variant="body" color="textMuted">
-          Connecting to Stellar {network.label}…
-        </Text>
-      );
-    case "offline":
-      return (
-        <Banner
-          tone="warning"
-          title={`Can't reach Stellar ${network.label}`}
-          message="Check your internet connection and pull down to try again."
-        />
-      );
-    case "wrong-network":
-      return (
-        <Banner
-          tone="danger"
-          title="Unexpected network"
-          message={`The server is not on Stellar ${network.label}. Cosignly will not use it.`}
-        />
-      );
-    case "online":
-      return (
-        <View style={styles.networkRows}>
-          <View style={styles.row}>
-            <Icon icon={Globe} color="success" />
-            <Text variant="body" color="success">
-              Connected to Stellar {network.label}
-            </Text>
-          </View>
-          <Text variant="caption" color="textMuted">
-            Last update from the network {timeAgo(state.status.latestLedgerClosedAt)}
-          </Text>
-        </View>
-      );
-  }
+function EmptyState() {
+  return (
+    <Card>
+      <Text variant="heading">No vaults yet</Text>
+      <Text variant="body" color="textMuted">
+        When someone adds your address as a signer to a vault, it shows up here automatically. Share
+        your address with them to get started.
+      </Text>
+      <Button
+        label="Show my address"
+        icon={QrCodeIcon}
+        variant="secondary"
+        fullWidth
+        onPress={() => router.push("/settings")}
+      />
+    </Card>
+  );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  content: { padding: screenPadding, gap: space.md },
-  topBar: { flexDirection: "row", justifyContent: "flex-end" },
+  content: { padding: screenPadding, gap: space.md, paddingBottom: space.huge },
+  topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  lockup: { width: 132, height: 132 / LOCKUP_HORIZONTAL_RATIO },
   iconButton: {
     minWidth: minTouchTarget,
     minHeight: minTouchTarget,
     alignItems: "center",
     justifyContent: "center",
   },
-  hero: { alignItems: "center", gap: space.xs, paddingBottom: space.xl },
-  lockup: { width: 160, height: 160 / LOCKUP_STACKED_RATIO },
-  row: { flexDirection: "row", alignItems: "center", gap: space.xs },
-  networkRows: { gap: space.xxs },
+  center: { alignItems: "center", gap: space.xs, paddingVertical: space.xl },
 });
