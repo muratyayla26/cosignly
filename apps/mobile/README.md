@@ -31,6 +31,12 @@ pnpm android --device              # = expo run:android --device
 
 The first build takes several minutes. Afterwards, `pnpm start` runs Metro and the installed Cosignly dev app reconnects; rebuild only when native dependencies or `app.json` change.
 
+**When you rebuild after a native or `app.json` change, regenerate the native projects first.** `expo run` does not re-apply `app.json` to existing `ios/` / `android/` folders:
+
+```bash
+npx expo prebuild --clean          # then pnpm ios --device / pnpm android --device
+```
+
 `ios/` and `android/` are generated (Continuous Native Generation) and gitignored — change native settings through `app.json` and config plugins, never by hand.
 
 ## Tests

@@ -8,3 +8,5 @@ export { QuorumProgress, type QuorumProgressProps } from "./QuorumProgress";
 export { StatusBadge, type ProposalBadgeStatus } from "./StatusBadge";
 export { Text, type TextProps } from "./Text";
 export { SegmentedControl, type SegmentedControlProps } from "./SegmentedControl";
+export { QrCode, type QrCodeProps } from "./QrCode";
+export { TextField, type TextFieldProps } from "./TextField";

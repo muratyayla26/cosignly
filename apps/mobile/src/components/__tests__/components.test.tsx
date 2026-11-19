@@ -11,11 +11,14 @@ import {
   AmountText,
   Banner,
   Button,
+  QrCode,
   QuorumProgress,
   SegmentedControl,
   StatusBadge,
   Text,
+  TextField,
 } from "..";
+import { qrPath } from "../QrCode";
 
 jest.mock("expo-clipboard", () => ({ setStringAsync: jest.fn(() => Promise.resolve(true)) }));
 
@@ -176,5 +179,25 @@ describe("SegmentedControl", () => {
     expect(screen.getByRole("radio", { name: "System" })).toBeSelected();
     await fireEvent.press(screen.getByRole("radio", { name: "Dark" }));
     expect(onChange).toHaveBeenCalledWith("dark");
+  });
+});
+
+describe("QrCode", () => {
+  it("encodes the address as a square grid of modules", async () => {
+    const { path, count } = qrPath(VAULT);
+    expect(count).toBeGreaterThanOrEqual(21);
+    expect(path.startsWith("M")).toBe(true);
+    await renderThemed(
+      <QrCode value={VAULT} accessibilityLabel="QR code of your public address" />,
+    );
+    expect(screen.getByLabelText("QR code of your public address")).toBeTruthy();
+  });
+});
+
+describe("TextField", () => {
+  it("shows its label and error", async () => {
+    await renderThemed(<TextField label="Secret key" value="" error="Enter your secret key." />);
+    expect(screen.getByLabelText("Secret key")).toBeTruthy();
+    expect(screen.getByText("Enter your secret key.")).toBeTruthy();
   });
 });

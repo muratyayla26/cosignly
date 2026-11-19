@@ -21,3 +21,5 @@ Critical tool and package versions. Update this file in the same PR that changes
 | @testing-library/react-native | ^14.1.0 | `apps/mobile` | v14: `render`, `fireEvent.*`, `unmount` are async — always `await` |
 | jest / jest-expo | ~30.5.2 / ~58.0.15 | `apps/mobile` | |
 | eslint-plugin-react-hooks | ^7.1.1 | root | |
+| expo-secure-store | ~58.0.3 | `apps/mobile` | Signer key storage (`requireAuthentication`). Config plugin sets the Face ID text |
+| qrcode | 1.5.4 (exact) | `apps/mobile` | Pure-JS QR encoder (`QRCode.create`); drawn with `react-native-svg`, which Lucide already needs. No native QR library |
