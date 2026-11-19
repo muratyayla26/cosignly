@@ -37,7 +37,7 @@ Components use **semantic tokens only** — never raw hex values. All text pairs
 | `surface` | `#FFFFFF` | `#141A33` | Cards, sheets |
 | `surfaceMuted` | `#EEF1F8` | `#1C2342` | Grouped rows, inputs |
 | `border` | `#DDE1EE` | `#2A3463` | Dividers, card outlines (decorative) |
-| `borderStrong` | `#7A82A8` | `#5D6899` | Input and control borders |
+| `borderStrong` | `#7A82A8` | `#6873A6` | Input and control borders |
 | `text` | `#0B1020` | `#F5F7FB` | Primary text |
 | `textMuted` | `#4A5480` | `#A9B1D6` | Secondary text, labels |
 | `primary` | `#4B4CE0` | `#8B8CFF` | Primary buttons, links, focus, "pending" ring |

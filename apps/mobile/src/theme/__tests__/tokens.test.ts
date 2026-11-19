@@ -34,6 +34,7 @@ const TEXT_PAIRS: [ColorToken, ColorToken][] = [
 const GRAPHIC_PAIRS: [ColorToken, ColorToken][] = [
   ["borderStrong", "surface"],
   ["borderStrong", "bg"],
+  ["borderStrong", "surfaceMuted"],
   ["successGraphic", "surface"],
   ["successGraphic", "bg"],
   ["primary", "surface"],

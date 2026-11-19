@@ -75,7 +75,7 @@ export const dark: ColorTokens = {
   surface: "#141A33",
   surfaceMuted: "#1C2342",
   border: "#2A3463",
-  borderStrong: "#5D6899",
+  borderStrong: "#6873A6",
   text: "#F5F7FB",
   textMuted: "#A9B1D6",
   primary: "#8B8CFF",
