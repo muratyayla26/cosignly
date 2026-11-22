@@ -215,6 +215,7 @@ Test ortamı: 1 iPhone + 1 Android (biyometrik kayıtlı) + CLI ile 3. imzacı. 
 
 - `docs/evidence.md`: tarih, görev, ne kanıtlandı, link (PR, commit, stellar.expert, Refractor, video, Worker health URL). Teknik olmayan biri tıklayarak doğrulayabilmeli.
 - `docs/weekly/week-N.md`: hafta sonu Chapter Lead'e gönderilecek rapor (`docs/weekly/TEMPLATE.md` formatı).
+- Kanıt türü haftadan haftaya değişir: PR'lar, işlem/hesap linkleri, Refractor linkleri, ekran görüntüleri. Ekran kaydı her hafta zorunlu değil; hafta sonunda o haftanın işine uygun kanıtı öner, eklenip eklenmeyeceğine Murat karar verir. (Sprint sonu demo videosu W4.4'te ayrıca var.)
 - Hafta 4: `docs/sprint-report.md` (SOW'da planlanan vs. teslim edilen), demo video çekim senaryoları.
 - Her hafta sonunda bana X'te paylaşabileceğim 2-3 cümlelik bir "build in public" özeti ve paylaşılabilecek bir ekran görüntüsü/kayıt önerisi ver (teknik detay az, görsel ilerleme çok).
 

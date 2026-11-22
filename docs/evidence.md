@@ -2,6 +2,8 @@
 
 Proof for each Instawards SOW deliverable. Every row should be verifiable by clicking the link — no local setup needed.
 
+The kind of evidence depends on the week's work: pull requests, transaction and account links, Refractor links, screenshots, and a screen recording only when a week's work calls for one. Weekly reports sent to the Chapter Lead link the repo, pull requests, screenshots and on-chain transactions.
+
 | Date | Task | What it proves | Link |
 |---|---|---|---|
 | 2026-11-18 | W1.1 | Monorepo, CI and repo docs in place | [PR #6](https://github.com/muratyayla26/cosignly/pull/6) |
@@ -13,4 +15,3 @@ Proof for each Instawards SOW deliverable. Every row should be verifiable by cli
 | 2026-11-19 | W1.5 | Incoming payment shown in vault activity ("Received 25 XLM") | [stellar.expert tx](https://stellar.expert/explorer/testnet/tx/b42d973f262bf08e85b72e96076a0b268b0a86ef59958f6daa029a02455984b7) |
 | 2026-11-19 | W1.5 | 2-of-2 vault created from the CLI appeared on the iPhone automatically (with the N-1 warning) | [stellar.expert](https://stellar.expert/explorer/testnet/account/GBS7QGG5CJ4JM46LZFW2Z6PLVBGN53OIN3TPVWBOT5HBWTJANI2QHDTP) |
 | 2026-11-19 | Week 1 | Week 1 tag on `main`, CI green | [week-1](https://github.com/muratyayla26/cosignly/releases/tag/week-1) · [CI](https://github.com/muratyayla26/cosignly/actions/runs/44530257920) |
-| 2026-11-19 | Week 1 | Screen recording: both phones, CLI vault → appears on iPhone → dashboard | _to be added_ |

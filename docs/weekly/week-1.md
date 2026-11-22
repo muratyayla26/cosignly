@@ -13,7 +13,6 @@
 Tested on an iPhone 16 (iOS 26) and a Galaxy A54 (Android 16), with a third signer simulated from the Stellar CLI.
 
 ## Evidence
-- Demo / screen recording: _to be added_
 - stellar.expert (testnet), 2-of-3 test vault found by both phones: https://stellar.expert/explorer/testnet/account/GDDTBEBLVLD32OEMRUEXH7KEHYK5VRVN6ZXAJF7NIWMUG3ATUGTCNLOL
 - stellar.expert (testnet), 2-of-2 vault created from the CLI that appeared on the iPhone automatically: https://stellar.expert/explorer/testnet/account/GBS7QGG5CJ4JM46LZFW2Z6PLVBGN53OIN3TPVWBOT5HBWTJANI2QHDTP
 - CI on `main`: https://github.com/muratyayla26/cosignly/actions/runs/44530257920
