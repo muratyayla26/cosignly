@@ -65,31 +65,32 @@ describe("templates", () => {
     (_label, template) => {
       const keys = five.slice(0, template.signers);
       const config = templateConfig(template, keys);
-      expect(config).not.toBeNull();
-      expect(config?.masterWeight).toBe(0);
-      expect(config?.signers.every((s) => s.weight === 1)).toBe(true);
-      expect(config?.thresholds).toEqual({
+      if (!config) throw new Error("expected a config");
+      expect(config.masterWeight).toBe(0);
+      expect(config.signers.every((s) => s.weight === 1)).toBe(true);
+      expect(config.thresholds).toEqual({
         low: template.required,
         medium: template.required,
         high: template.required,
       });
-      expect(validateVaultConfig(config!).valid).toBe(true);
-      expect(describeThresholds(config!).summary).toBe(
+      expect(validateVaultConfig(config).valid).toBe(true);
+      expect(describeThresholds(config).summary).toBe(
         `Payments need ${template.label}. Changing signers needs ${template.label}.`,
       );
     },
   );
 
   it("returns null when the signer count doesn't match", () => {
-    expect(templateConfig(VAULT_TEMPLATES[1]!, [ALEX, SAM])).toBeNull();
+    const twoOfThree = { id: "2-of-3", required: 2, signers: 3, label: "2 of 3" } as const;
+    expect(templateConfig(twoOfThree, [ALEX, SAM])).toBeNull();
   });
 
   it("2 of 2 needs N-1 confirmation; 2 of 3 and 3 of 5 do not", () => {
     const issues = (id: string) => {
-      const t = VAULT_TEMPLATES.find((x) => x.id === id)!;
-      return validateVaultConfig(templateConfig(t, five.slice(0, t.signers))!).issues.map(
-        (i) => i.code,
-      );
+      const t = VAULT_TEMPLATES.find((x) => x.id === id);
+      const config = t && templateConfig(t, five.slice(0, t.signers));
+      if (!config) throw new Error(`no config for ${id}`);
+      return validateVaultConfig(config).issues.map((i) => i.code);
     };
     expect(issues("2-of-2")).toEqual(["N_MINUS_ONE"]);
     expect(issues("2-of-3")).toEqual([]);
