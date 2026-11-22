@@ -38,6 +38,8 @@ export default function SignersStep() {
   return (
     <StepLayout
       step={2}
+      // Add / Paste / Scan QR sit next to the field; Next can stay under the keyboard.
+      footerWithKeyboard="behind"
       title="Add signers"
       intro="Signers are the people who approve payments from this vault. Ask each one for their Cosignly address (Settings → Your signer key) or any Stellar address they control."
       footer={

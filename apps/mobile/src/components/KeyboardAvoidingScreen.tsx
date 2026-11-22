@@ -10,11 +10,24 @@ import {
 } from "react";
 import { Keyboard, Platform, StyleSheet, View, type KeyboardEvent } from "react-native";
 
-const KeyboardOpenContext = createContext(false);
+interface KeyboardState {
+  /** Height of this screen the keyboard covers (0 when hidden). */
+  overlap: number;
+  /** `true` when the screen itself makes room (footer sits on the keyboard). */
+  avoiding: boolean;
+}
 
-/** `true` while the keyboard covers part of the enclosing `KeyboardAvoidingScreen`. */
+const KeyboardContext = createContext<KeyboardState>({ overlap: 0, avoiding: false });
+
+/** `true` while the screen is lifted above the keyboard (footers drop their bottom inset). */
 export function useKeyboardOpen(): boolean {
-  return useContext(KeyboardOpenContext);
+  const { overlap, avoiding } = useContext(KeyboardContext);
+  return avoiding && overlap > 0;
+}
+
+/** Height of the enclosing `KeyboardAvoidingScreen` the keyboard covers, in points. */
+export function useKeyboardOverlap(): number {
+  return useContext(KeyboardContext).overlap;
 }
 
 /**
@@ -34,7 +47,18 @@ export function useKeyboardOpen(): boolean {
  * Children that add their own bottom safe-area inset should drop it while
  * `useKeyboardOpen()` is true: the keyboard already covers that area.
  */
-export function KeyboardAvoidingScreen({ children }: { children: ReactNode }) {
+export function KeyboardAvoidingScreen({
+  children,
+  avoid = true,
+}: {
+  children: ReactNode;
+  /**
+   * `true`: add bottom padding so everything (including a footer) moves above
+   * the keyboard. `false`: only measure; children use `useKeyboardOverlap()`,
+   * e.g. to shrink just a ScrollView while a footer stays behind the keyboard.
+   */
+  avoid?: boolean;
+}) {
   const ref = useRef<ComponentRef<typeof View>>(null);
   // Top edge of the keyboard in window coordinates, or null when it's hidden.
   const keyboardTop = useRef<number | null>(null);
@@ -62,15 +86,20 @@ export function KeyboardAvoidingScreen({ children }: { children: ReactNode }) {
       keyboardTop.current = null;
       update();
     };
-    // Move up once the keyboard is in place ("did"), so the footer never floats
-    // over empty space while the keyboard slides in. On iOS move down as soon as
-    // it starts hiding ("will"), so the footer never sits behind it.
-    const subscriptions = [
-      Keyboard.addListener("keyboardDidShow", onShow),
+    // iOS sends "will" events as the keyboard starts moving, so the layout jumps
+    // to its final place at once ("did" arrives only after the slide, which
+    // feels late). Android only has "did" events.
+    const subscriptions =
       Platform.OS === "ios"
-        ? Keyboard.addListener("keyboardWillHide", onHide)
-        : Keyboard.addListener("keyboardDidHide", onHide),
-    ];
+        ? [
+            Keyboard.addListener("keyboardWillShow", onShow),
+            Keyboard.addListener("keyboardWillChangeFrame", onShow),
+            Keyboard.addListener("keyboardWillHide", onHide),
+          ]
+        : [
+            Keyboard.addListener("keyboardDidShow", onShow),
+            Keyboard.addListener("keyboardDidHide", onHide),
+          ];
     // The keyboard may already be open when this screen mounts.
     const metrics = Keyboard.metrics();
     if (Keyboard.isVisible() && metrics) {
@@ -82,9 +111,9 @@ export function KeyboardAvoidingScreen({ children }: { children: ReactNode }) {
 
   return (
     <View ref={ref} style={styles.flex} onLayout={() => update()}>
-      <KeyboardOpenContext value={overlap > 0}>
-        <View style={[styles.flex, { paddingBottom: overlap }]}>{children}</View>
-      </KeyboardOpenContext>
+      <KeyboardContext value={{ overlap, avoiding: avoid }}>
+        <View style={[styles.flex, avoid && { paddingBottom: overlap }]}>{children}</View>
+      </KeyboardContext>
     </View>
   );
 }
