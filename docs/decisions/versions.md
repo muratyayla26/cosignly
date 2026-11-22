@@ -23,3 +23,4 @@ Critical tool and package versions. Update this file in the same PR that changes
 | eslint-plugin-react-hooks | ^7.1.1 | root | |
 | expo-secure-store | ~58.0.3 | `apps/mobile` | Signer key storage (`requireAuthentication`). Config plugin sets the Face ID text |
 | qrcode | 1.5.4 (exact) | `apps/mobile` | Pure-JS QR encoder (`QRCode.create`); drawn with `react-native-svg`, which Lucide already needs. No native QR library |
+| expo-camera | ~58.0.14 | `apps/mobile` | QR scanning of signer addresses (`CameraView` built-in barcode scanner, QR only). Config plugin: camera text set, microphone and `RECORD_AUDIO` off |

@@ -1,6 +1,6 @@
 import { cryptoSelfCheck } from "@cosignly/shared";
 import { Redirect, router } from "expo-router";
-import { Palette, QrCode as QrCodeIcon, Settings } from "lucide-react-native";
+import { Palette, Plus, QrCode as QrCodeIcon, Settings } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
 import {
   ActivityIndicator,
@@ -141,6 +141,15 @@ function VaultList({ publicKey }: { publicKey: string }) {
                 />
               ))
             )}
+            {vaults.state.data.length > 0 ? (
+              <Button
+                label="Create a vault"
+                icon={Plus}
+                variant="secondary"
+                fullWidth
+                onPress={() => router.push("/vault-setup")}
+              />
+            ) : null}
             <Text variant="caption" color="textMuted" align="center">
               Stellar {network.label} · updated {timeAgo(vaults.state.updatedAt)}
             </Text>
@@ -165,9 +174,15 @@ function EmptyState() {
     <Card>
       <Text variant="heading">No vaults yet</Text>
       <Text variant="body" color="textMuted">
-        When someone adds your address as a signer to a vault, it shows up here automatically. Share
-        your address with them to get started.
+        Create a vault with your team, or share your address so someone can add you to theirs.
+        Vaults you sign for show up here automatically.
       </Text>
+      <Button
+        label="Create a vault"
+        icon={Plus}
+        fullWidth
+        onPress={() => router.push("/vault-setup")}
+      />
       <Button
         label="Show my address"
         icon={QrCodeIcon}

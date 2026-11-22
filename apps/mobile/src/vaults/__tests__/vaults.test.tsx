@@ -80,6 +80,8 @@ describe("Home (vault list)", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: /Vault GDDT…NLOL/ }));
     expect(router.push).toHaveBeenCalledWith({ pathname: "/vault/[id]", params: { id: VAULT } });
+    await fireEvent.press(screen.getByRole("button", { name: "Create a vault" }));
+    expect(router.push).toHaveBeenCalledWith("/vault-setup");
   });
 
   it("explains what to do when the key is in no vault yet", async () => {
@@ -88,6 +90,8 @@ describe("Home (vault list)", () => {
     expect(await screen.findByText("No vaults yet")).toBeTruthy();
     await fireEvent.press(screen.getByRole("button", { name: "Show my address" }));
     expect(router.push).toHaveBeenCalledWith("/settings");
+    await fireEvent.press(screen.getByRole("button", { name: "Create a vault" }));
+    expect(router.push).toHaveBeenCalledWith("/vault-setup");
   });
 
   it("shows an offline warning when Horizon cannot be reached", async () => {

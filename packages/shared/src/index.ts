@@ -18,3 +18,4 @@ export * from "./keys";
 export * from "./amount";
 export * from "./vault/reserve";
 export * from "./horizon/activity";
+export * from "./vault/setup";
