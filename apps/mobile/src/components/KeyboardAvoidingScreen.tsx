@@ -8,14 +8,7 @@ import {
   type ComponentRef,
   type ReactNode,
 } from "react";
-import {
-  Keyboard,
-  LayoutAnimation,
-  Platform,
-  StyleSheet,
-  View,
-  type KeyboardEvent,
-} from "react-native";
+import { Keyboard, Platform, StyleSheet, View, type KeyboardEvent } from "react-native";
 
 const KeyboardOpenContext = createContext(false);
 
@@ -47,43 +40,37 @@ export function KeyboardAvoidingScreen({ children }: { children: ReactNode }) {
   const keyboardTop = useRef<number | null>(null);
   const [overlap, setOverlap] = useState(0);
 
-  const update = useCallback((animate?: KeyboardEvent) => {
+  // No animation: the footer jumps straight to its place (the same on both platforms).
+  const update = useCallback(() => {
     const top = keyboardTop.current;
     if (top === null) {
-      if (animate && Platform.OS === "ios")
-        LayoutAnimation.configureNext(keyboardAnimation(animate));
       setOverlap(0);
       return;
     }
     ref.current?.measureInWindow((_x, y, _width, height) => {
       if (height === 0) return; // not laid out yet; onLayout will call again
-      const next = Math.max(0, Math.round(y + height - top));
-      if (animate && Platform.OS === "ios")
-        LayoutAnimation.configureNext(keyboardAnimation(animate));
-      setOverlap(next);
+      setOverlap(Math.max(0, Math.round(y + height - top)));
     });
   }, []);
 
   useEffect(() => {
     const onShow = (e: KeyboardEvent) => {
       keyboardTop.current = e.endCoordinates.screenY;
-      update(e);
+      update();
     };
-    const onHide = (e: KeyboardEvent) => {
+    const onHide = () => {
       keyboardTop.current = null;
-      update(e);
+      update();
     };
-    const subscriptions =
+    // Move up once the keyboard is in place ("did"), so the footer never floats
+    // over empty space while the keyboard slides in. On iOS move down as soon as
+    // it starts hiding ("will"), so the footer never sits behind it.
+    const subscriptions = [
+      Keyboard.addListener("keyboardDidShow", onShow),
       Platform.OS === "ios"
-        ? [
-            Keyboard.addListener("keyboardWillShow", onShow),
-            Keyboard.addListener("keyboardWillChangeFrame", onShow),
-            Keyboard.addListener("keyboardWillHide", onHide),
-          ]
-        : [
-            Keyboard.addListener("keyboardDidShow", onShow),
-            Keyboard.addListener("keyboardDidHide", onHide),
-          ];
+        ? Keyboard.addListener("keyboardWillHide", onHide)
+        : Keyboard.addListener("keyboardDidHide", onHide),
+    ];
     // The keyboard may already be open when this screen mounts.
     const metrics = Keyboard.metrics();
     if (Keyboard.isVisible() && metrics) {
@@ -100,14 +87,6 @@ export function KeyboardAvoidingScreen({ children }: { children: ReactNode }) {
       </KeyboardOpenContext>
     </View>
   );
-}
-
-function keyboardAnimation(e: KeyboardEvent) {
-  const duration = Math.max(e.duration || 250, 10);
-  return {
-    duration,
-    update: { duration, type: LayoutAnimation.Types.keyboard },
-  };
 }
 
 const styles = StyleSheet.create({ flex: { flex: 1 } });
