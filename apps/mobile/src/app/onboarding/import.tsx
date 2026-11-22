@@ -3,9 +3,9 @@ import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import { ClipboardPaste, Fingerprint } from "lucide-react-native";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
-import { Banner, Button, Text, TextField } from "@/components";
+import { Banner, Button, KeyboardAvoidingScreen, Text, TextField } from "@/components";
 import {
   biometricName,
   SignerErrorBanner,
@@ -52,10 +52,7 @@ export default function ImportKeyScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <KeyboardAvoidingScreen>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text variant="body" color="textMuted">
           Enter the secret key of a Stellar account you control. It starts with S and has 56
@@ -107,11 +104,10 @@ export default function ImportKeyScreen() {
           accessibilityHint={`Saves the key on this phone and asks for ${biometricName}`}
         />
       </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
   content: { padding: screenPadding, gap: space.md, paddingBottom: space.huge },
 });

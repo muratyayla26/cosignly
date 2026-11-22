@@ -14,3 +14,4 @@ export { ThresholdSummary, type ThresholdSummaryProps } from "./ThresholdSummary
 export { VaultCard, type VaultCardProps } from "./VaultCard";
 export { Checkbox, type CheckboxProps } from "./Checkbox";
 export { Stepper, type StepperProps } from "./Stepper";
+export { KeyboardAvoidingScreen } from "./KeyboardAvoidingScreen";
