@@ -8,7 +8,7 @@
 - …
 
 ## Evidence
-- Demo / screen recording: <link>
+- Screenshots / screen recording (only if this week's work calls for one): <link>
 - stellar.expert (testnet): <vault or transaction link>
 - Other (Refractor link, Worker health URL, build link): <link>
 
