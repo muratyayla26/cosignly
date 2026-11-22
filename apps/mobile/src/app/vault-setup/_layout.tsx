@@ -19,6 +19,15 @@ export default function VaultSetupLayout() {
         <Stack.Screen name="scan" options={{ title: "Scan address", presentation: "modal" }} />
         <Stack.Screen name="rules" options={{ title: "Approval rules" }} />
         <Stack.Screen name="review" options={{ title: "Review" }} />
+        <Stack.Screen
+          name="create"
+          options={{
+            title: "Creating vault",
+            headerBackVisible: false,
+            gestureEnabled: false,
+            fullScreenGestureEnabled: false,
+          }}
+        />
       </Stack>
     </VaultSetupProvider>
   );

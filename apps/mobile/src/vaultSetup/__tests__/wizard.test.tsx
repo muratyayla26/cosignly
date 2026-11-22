@@ -2,7 +2,6 @@ import { generateSignerKeypair } from "@cosignly/shared";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { router } from "expo-router";
 import type { ReactElement } from "react";
-import { Alert } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import ReviewStep from "@/app/vault-setup/review";
@@ -104,7 +103,6 @@ describe("Rules step", () => {
 
 describe("Review step", () => {
   it("2 of 3: shows the summary and reserve cost, and can be submitted", async () => {
-    const alert = jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
     await renderStep(<ReviewStep />, [
       { type: "addSigner", key: SAM },
       { type: "addSigner", key: JORDAN },
@@ -117,7 +115,7 @@ describe("Review step", () => {
     expect(screen.queryByRole("checkbox")).toBeNull();
     expect(createButton()).toBeEnabled();
     await fireEvent.press(createButton());
-    expect(alert).toHaveBeenCalled();
+    expect(router.push).toHaveBeenCalledWith("/vault-setup/create");
   });
 
   it("2 of 2: the N-1 warning needs explicit confirmation", async () => {

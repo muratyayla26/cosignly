@@ -2,7 +2,6 @@ import {
   getUsdc,
   isSameAsset,
   toVault,
-  truncateAddress,
   XLM,
   type AccountInfo,
   type Balance,
@@ -51,7 +50,4 @@ export function sortedBalances(balances: readonly Balance[]): Balance[] {
   return [...balances].sort((a, b) => rank(a) - rank(b));
 }
 
-/** "Vault GDDT…NLOL" until vaults get local names (W2.2). */
-export function vaultTitle(accountId: string): string {
-  return `Vault ${truncateAddress(accountId)}`;
-}
+export { vaultTitle } from "./names";

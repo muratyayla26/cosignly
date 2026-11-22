@@ -1,7 +1,7 @@
 import { cryptoSelfCheck } from "@cosignly/shared";
-import { Redirect, router } from "expo-router";
+import { Redirect, router, useFocusEffect } from "expo-router";
 import { Palette, Plus, QrCode as QrCodeIcon, Settings } from "lucide-react-native";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -22,6 +22,7 @@ import { useRemoteData } from "@/lib/useRemoteData";
 import { useSigner } from "@/signer";
 import { minTouchTarget, screenPadding, space, useTheme } from "@/theme";
 import { loadVaults, sortedBalances, vaultTitle } from "@/vaults/data";
+import { useVaultNames } from "@/vaults/names";
 
 /** Home: the vaults this phone's signer key can approve for. */
 export default function HomeScreen() {
@@ -36,6 +37,16 @@ function VaultList({ publicKey }: { publicKey: string }) {
   const net = useNetworkStatus();
   const load = useCallback((signal: AbortSignal) => loadVaults(publicKey, signal), [publicKey]);
   const vaults = useRemoteData(load);
+  const { names } = useVaultNames();
+  // Reload when coming back to Home (e.g. after creating a vault); the first focus is the initial load.
+  const focused = useRef(false);
+  const { reload } = vaults;
+  useFocusEffect(
+    useCallback(() => {
+      if (focused.current) void reload();
+      focused.current = true;
+    }, [reload]),
+  );
   // Runs once per launch: proves secure randomness + Ed25519 work on this device.
   const selfCheck = useMemo(() => cryptoSelfCheck(), []);
 
@@ -132,7 +143,7 @@ function VaultList({ publicKey }: { publicKey: string }) {
               vaults.state.data.map(({ vault, account }) => (
                 <VaultCard
                   key={vault.accountId}
-                  title={vaultTitle(vault.accountId)}
+                  title={vaultTitle(vault.accountId, names)}
                   vault={vault}
                   balances={sortedBalances(account.balances)}
                   onPress={() =>

@@ -55,6 +55,29 @@ export class HorizonError extends Error {
   }
 }
 
+/**
+ * A transaction Horizon rejected. `resultCodes` are Horizon's codes, e.g.
+ * `{ transaction: "tx_failed", operations: ["op_success", "op_low_reserve"] }`.
+ */
+export class TransactionSubmitError extends HorizonError {
+  readonly resultCodes: { transaction?: string; operations?: string[] };
+
+  constructor(status: number, problem?: HorizonProblem) {
+    super(status, problem);
+    this.name = "TransactionSubmitError";
+    const codes = (problem?.extras?.result_codes ?? {}) as {
+      transaction?: string;
+      operations?: string[];
+    };
+    this.resultCodes = codes;
+  }
+}
+
+export interface SubmittedTransaction {
+  hash: string;
+  ledger: number;
+}
+
 export interface HorizonClientOptions {
   network: NetworkConfig;
   /** Defaults to the global `fetch` (React Native, Workers, Node 18+). */
@@ -95,6 +118,13 @@ export interface HorizonClient {
   discoverVaults(signer: string, options?: FindBySignerOptions): Promise<Vault[]>;
   /** Latest successful operations on an account, newest first, in plain language. `[]` if the account does not exist. */
   getActivity(accountId: string, options?: ActivityOptions): Promise<VaultActivity[]>;
+  /**
+   * Submits a signed transaction envelope (base64 XDR) and waits until it is in
+   * a ledger. Throws `TransactionSubmitError` with Horizon's result codes if it
+   * is rejected. Resubmitting an already applied transaction returns the same
+   * result, so retrying after a network error is safe.
+   */
+  submitTransaction(xdr: string, options?: RequestOptions): Promise<SubmittedTransaction>;
 }
 
 export interface ActivityOptions extends RequestOptions {
@@ -182,7 +212,31 @@ export function createHorizonClient({
     }
   }
 
-  return { getNetworkStatus, getAccount, findAccountsBySigner, discoverVaults, getActivity };
+  async function submitTransaction(xdr: string, options?: RequestOptions) {
+    const response = await doFetch(`${base}/transactions`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `tx=${encodeURIComponent(xdr)}`,
+      ...(options?.signal ? { signal: options.signal } : {}),
+    });
+    if (!response.ok) {
+      throw new TransactionSubmitError(response.status, await readProblem(response));
+    }
+    const body = (await response.json()) as { hash: string; ledger: number };
+    return { hash: body.hash, ledger: body.ledger };
+  }
+
+  return {
+    getNetworkStatus,
+    getAccount,
+    findAccountsBySigner,
+    discoverVaults,
+    getActivity,
+    submitTransaction,
+  };
 }
 
 export function toAccountInfo(raw: HorizonAccount): AccountInfo {

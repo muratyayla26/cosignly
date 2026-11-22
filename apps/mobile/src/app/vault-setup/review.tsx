@@ -7,7 +7,8 @@ import {
   type VaultIssueCode,
 } from "@cosignly/shared";
 import { ShieldCheck } from "lucide-react-native";
-import { Alert, StyleSheet, View } from "react-native";
+import { router } from "expo-router";
+import { StyleSheet, View } from "react-native";
 
 import {
   AddressChip,
@@ -49,9 +50,7 @@ export default function ReviewStep() {
   const equalWeights = config?.signers.every((s) => s.weight === 1) ?? true;
 
   const create = () => {
-    if (!canSubmit) return;
-    // Building and submitting the vault transaction is W2.2.
-    Alert.alert("Not available yet", "Creating the vault on Stellar comes in the next update.");
+    if (canSubmit) router.push("/vault-setup/create");
   };
 
   return (

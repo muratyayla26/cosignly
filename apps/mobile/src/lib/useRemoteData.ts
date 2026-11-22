@@ -62,5 +62,11 @@ export function useRemoteData<T>(load: (signal: AbortSignal) => Promise<T>) {
     setRefreshing(false);
   }, [load]);
 
-  return { state, refreshing, refresh };
+  /** Reloads without the pull-to-refresh spinner (e.g. when a screen regains focus). */
+  const reload = useCallback(async () => {
+    const outcome = await attempt(load);
+    setState((prev) => next(prev, outcome));
+  }, [load]);
+
+  return { state, refreshing, refresh, reload };
 }

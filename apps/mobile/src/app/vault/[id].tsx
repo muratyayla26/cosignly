@@ -45,6 +45,7 @@ import { useRemoteData } from "@/lib/useRemoteData";
 import { useSigner } from "@/signer";
 import { minTouchTarget, screenPadding, space, useTheme, type ColorToken } from "@/theme";
 import { loadVaultDetail, sortedBalances, vaultTitle, type VaultDetail } from "@/vaults/data";
+import { useVaultNames } from "@/vaults/names";
 
 /** One vault: balances, approval rules, signers and recent history. */
 export default function VaultScreen() {
@@ -52,6 +53,7 @@ export default function VaultScreen() {
   const { colors } = useTheme();
   const load = useCallback((signal: AbortSignal) => loadVaultDetail(id, signal), [id]);
   const detail = useRemoteData(load);
+  const { names } = useVaultNames();
 
   return (
     <ScrollView
@@ -64,7 +66,7 @@ export default function VaultScreen() {
         />
       }
     >
-      <Stack.Screen options={{ title: vaultTitle(id) }} />
+      <Stack.Screen options={{ title: vaultTitle(id, names) }} />
       <AddressChip address={id} showExplorerLink />
 
       {detail.state.kind === "loading" ? (
