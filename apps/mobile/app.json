@@ -44,6 +44,14 @@
         {
           "faceIDPermission": "Cosignly uses Face ID to unlock your signer key when you approve a transaction."
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Cosignly uses the camera to scan a signer's address from a QR code.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "experiments": {
