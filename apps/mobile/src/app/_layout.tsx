@@ -9,8 +9,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
+import { useStackScreenOptions } from "@/lib/stackOptions";
 import { SignerProvider, useSigner } from "@/signer";
-import { fonts, ThemeProvider, useTheme } from "@/theme";
+import { ThemeProvider, useTheme } from "@/theme";
 
 // Keep the native splash up until fonts, the stored theme choice and the signer
 // state are ready (no flash, no glimpse of the wrong first screen).
@@ -27,7 +28,8 @@ export default function RootLayout() {
 }
 
 function RootStack() {
-  const { colors, scheme, ready } = useTheme();
+  const { scheme, ready } = useTheme();
+  const screenOptions = useStackScreenOptions();
   const { state: signer } = useSigner();
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
@@ -47,20 +49,11 @@ function RootStack() {
   return (
     <>
       <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.bg },
-          headerTintColor: colors.primary,
-          headerTitleStyle: { fontFamily: fonts.semibold, color: colors.text },
-          headerShadowVisible: false,
-          // Back button shows only the chevron, never the previous screen's title.
-          headerBackButtonDisplayMode: "minimal",
-          contentStyle: { backgroundColor: colors.bg },
-        }}
-      >
+      <Stack screenOptions={screenOptions}>
         <Stack.Screen name="index" options={{ title: "Cosignly", headerShown: false }} />
         <Stack.Screen name="settings" options={{ title: "Settings" }} />
         <Stack.Screen name="vault/[id]" options={{ title: "Vault" }} />
+        <Stack.Screen name="vault-setup" options={{ headerShown: false }} />
         <Stack.Screen name="design" options={{ title: "Design preview" }} />
         <Stack.Screen name="onboarding/index" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding/recovery" options={{ title: "" }} />
