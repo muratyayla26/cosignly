@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react-native";
 import { router } from "expo-router";
 import type { ReactElement } from "react";
 import { Alert } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import ReviewStep from "@/app/vault-setup/review";
 import RulesStep from "@/app/vault-setup/rules";
@@ -20,17 +21,25 @@ const ALEX = "GCFA5GKYNJDLCLHLGJMYKBASQ2JNN43T67MS6GALL6CGKEPMSELOORJ7";
 const SAM = "GDGKPPMM5BORTIJLY2IC2OCU33OACYDRHMOUJAFRXHY4GTYOJD2QT4CY";
 const JORDAN = "GDCHQZAQROW52J3O7WJUTFQMCB6HB7TJXVV33LPJS5PIHG3X5H55TXR5";
 
+// iPhone 16 portrait (Expo Router provides the real SafeAreaProvider in the app).
+const SAFE_AREA = {
+  frame: { x: 0, y: 0, width: 393, height: 852 },
+  insets: { top: 59, left: 0, right: 0, bottom: 34 },
+};
+
 async function renderStep(ui: ReactElement, actions: SetupAction[] = []) {
   return await render(
-    <ThemeProvider initialPreference="light">
-      {/* Start as if the earlier steps were done. */}
-      <VaultSetupProvider
-        ownKey={ALEX}
-        initialActions={[{ type: "setName", name: "Team Vault" }, ...actions]}
-      >
-        {ui}
-      </VaultSetupProvider>
-    </ThemeProvider>,
+    <SafeAreaProvider initialMetrics={SAFE_AREA}>
+      <ThemeProvider initialPreference="light">
+        {/* Start as if the earlier steps were done. */}
+        <VaultSetupProvider
+          ownKey={ALEX}
+          initialActions={[{ type: "setName", name: "Team Vault" }, ...actions]}
+        >
+          {ui}
+        </VaultSetupProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>,
   );
 }
 

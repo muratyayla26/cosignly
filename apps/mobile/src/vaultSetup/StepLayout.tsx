@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { KeyboardAvoidingScreen, Text } from "@/components";
+import { KeyboardAvoidingScreen, Text, useKeyboardOpen } from "@/components";
 import { screenPadding, space, useTheme } from "@/theme";
 
 export const SETUP_STEPS = 4;
@@ -21,7 +21,6 @@ export function StepLayout({
   children: ReactNode;
   footer: ReactNode;
 }) {
-  const { colors } = useTheme();
   return (
     <KeyboardAvoidingScreen>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -38,18 +37,38 @@ export function StepLayout({
         ) : null}
         {children}
       </ScrollView>
-      <SafeAreaView
-        edges={["bottom"]}
-        style={[styles.footer, { backgroundColor: colors.bg, borderTopColor: colors.border }]}
-      >
-        <View style={styles.footerInner}>{footer}</View>
-      </SafeAreaView>
+      <Footer>{footer}</Footer>
     </KeyboardAvoidingScreen>
+  );
+}
+
+/** Sits on the keyboard while it's open; above the home indicator / navigation bar otherwise. */
+function Footer({ children }: { children: ReactNode }) {
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const keyboardOpen = useKeyboardOpen();
+  return (
+    <View
+      style={[
+        styles.footer,
+        {
+          backgroundColor: colors.bg,
+          borderTopColor: colors.border,
+          paddingBottom: screenPadding + (keyboardOpen ? 0 : insets.bottom),
+        },
+      ]}
+    >
+      {children}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   content: { padding: screenPadding, gap: space.md, paddingBottom: space.xl },
-  footer: { borderTopWidth: StyleSheet.hairlineWidth },
-  footerInner: { padding: screenPadding, gap: space.xs },
+  footer: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: screenPadding,
+    paddingHorizontal: screenPadding,
+    gap: space.xs,
+  },
 });
