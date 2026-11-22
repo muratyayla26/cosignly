@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { useStackScreenOptions } from "@/lib/stackOptions";
 import { SignerProvider, useSigner } from "@/signer";
 import { ThemeProvider, useTheme } from "@/theme";
+import { VaultNamesProvider } from "@/vaults/names";
 
 // Keep the native splash up until fonts, the stored theme choice and the signer
 // state are ready (no flash, no glimpse of the wrong first screen).
@@ -21,7 +22,9 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <SignerProvider>
-        <RootStack />
+        <VaultNamesProvider>
+          <RootStack />
+        </VaultNamesProvider>
       </SignerProvider>
     </ThemeProvider>
   );

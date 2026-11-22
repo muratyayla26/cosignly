@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { router } from "expo-router";
-import type { ReactElement } from "react";
+import type { ReactElement, useEffect } from "react";
 import { AppState } from "react-native";
 
 import HomeScreen from "@/app/index";
@@ -43,6 +43,9 @@ jest.mock("@/lib/stellar", () => {
 jest.mock("expo-router", () => ({
   router: { push: jest.fn(), replace: jest.fn() },
   Redirect: () => null,
+  // Runs like an effect: once per mount (the screen's first focus).
+  useFocusEffect: (cb: () => void) =>
+    jest.requireActual<{ useEffect: typeof useEffect }>("react").useEffect(cb, [cb]),
   Stack: { Screen: () => null },
   useLocalSearchParams: jest.fn(() => ({
     id: "GDDTBEBLVLD32OEMRUEXH7KEHYK5VRVN6ZXAJF7NIWMUG3ATUGTCNLOL",
