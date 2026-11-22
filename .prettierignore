@@ -10,3 +10,4 @@ assets/brand
 
 # Markdown is hand-written; keep authors' formatting.
 *.md
+apps/mobile/expo-env.d.ts
