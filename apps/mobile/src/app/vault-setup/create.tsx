@@ -10,10 +10,10 @@ import {
   type VaultCreationStep,
 } from "@cosignly/shared";
 import * as Linking from "expo-linking";
-import { router, Stack } from "expo-router";
+import { router, Stack, useFocusEffect, useNavigation } from "expo-router";
 import { Circle, CircleCheck, ExternalLink, RotateCcw, ShieldCheck } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { ActivityIndicator, BackHandler, ScrollView, StyleSheet, View } from "react-native";
 
 import { AddressChip, Banner, Button, Card, Icon, Text } from "@/components";
 import { horizon, network } from "@/lib/stellar";
@@ -92,20 +92,42 @@ export default function CreateVaultScreen() {
     (s) => s.step === (phase.kind === "done" ? "verify" : phase.step),
   );
 
-  const close = () => router.dismissAll();
+  // Leave the whole wizard: back to Home, never to an earlier wizard step.
+  const close = useCallback(() => router.dismissTo("/"), []);
   const openVault = (accountId: string) => {
-    router.dismissAll();
+    close();
     router.push({ pathname: "/vault/[id]", params: { id: accountId } });
   };
+
+  // No swipe back on this screen or on the wizard as a whole: on iOS 26 the
+  // full-screen swipe would otherwise reach the root stack and close the wizard.
+  const navigation = useNavigation();
+  useEffect(() => {
+    const parent = navigation.getParent();
+    parent?.setOptions({ gestureEnabled: false });
+    return () => parent?.setOptions({ gestureEnabled: true });
+  }, [navigation]);
+
+  // Android back button: ignored while working; afterwards it closes the wizard like "Close".
+  useFocusEffect(
+    useCallback(() => {
+      const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+        if (phase.kind !== "running") close();
+        return true;
+      });
+      return () => sub.remove();
+    }, [phase.kind, close]),
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
       <Stack.Screen
         options={{
           title: phase.kind === "done" ? "Vault created" : "Creating vault",
-          // No going back halfway; the screen offers Close / Try again itself.
+          // No going back; the screen offers Close / Try again / Open vault itself.
           headerBackVisible: false,
           gestureEnabled: false,
+          fullScreenGestureEnabled: false,
         }}
       />
       <Text variant="title" accessibilityRole="header">

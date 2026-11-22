@@ -2,6 +2,7 @@ import { startVaultCreation, VaultCreationError, type VaultCreation } from "@cos
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
+import type { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import CreateVaultScreen from "@/app/vault-setup/create";
@@ -11,9 +12,13 @@ import { VAULT_NAMES_STORAGE_KEY, VaultNamesProvider } from "@/vaults/names";
 import type { SetupAction } from "../state";
 import { VaultSetupProvider } from "../VaultSetupProvider";
 
+const mockParentOptions = jest.fn();
 jest.mock("expo-router", () => ({
-  router: { push: jest.fn(), dismissAll: jest.fn() },
+  router: { push: jest.fn(), dismissTo: jest.fn() },
   Stack: { Screen: () => null },
+  useNavigation: () => ({ getParent: () => ({ setOptions: mockParentOptions }) }),
+  useFocusEffect: (cb: () => void) =>
+    jest.requireActual<{ useEffect: typeof useEffect }>("react").useEffect(cb, [cb]),
 }));
 jest.mock("expo-clipboard", () => ({ setStringAsync: jest.fn() }));
 jest.mock("expo-linking", () => ({ openURL: jest.fn() }));
@@ -89,9 +94,13 @@ describe("Create vault screen", () => {
       [VAULT]: "Team Vault",
     });
 
+    // Home → vault: back from the vault goes to Home, not into the wizard.
     await fireEvent.press(screen.getByRole("button", { name: "Open vault" }));
-    expect(router.dismissAll).toHaveBeenCalled();
+    expect(router.dismissTo).toHaveBeenCalledWith("/");
     expect(router.push).toHaveBeenCalledWith({ pathname: "/vault/[id]", params: { id: VAULT } });
+    expect(jest.mocked(router.dismissTo).mock.invocationCallOrder[0]).toBeLessThan(
+      jest.mocked(router.push).mock.invocationCallOrder[0] ?? 0,
+    );
   });
 
   it("shows the failed step and resumes the same creation on Try again", async () => {
@@ -102,6 +111,8 @@ describe("Create vault screen", () => {
     await renderCreate();
     expect(await screen.findByText("The vault wasn't created")).toBeTruthy();
     expect(screen.getByText("Stellar didn't accept the vault setup.")).toBeTruthy();
+    // The whole wizard can't be swiped away while this screen is open.
+    expect(mockParentOptions).toHaveBeenCalledWith({ gestureEnabled: false });
 
     creation.run.mockImplementationOnce(async () => ({
       accountId: VAULT,
@@ -113,6 +124,15 @@ describe("Create vault screen", () => {
     // Same in-memory creation: no new setup key, no second Friendbot request.
     expect(startVaultCreation).toHaveBeenCalledTimes(1);
     expect(creation.run).toHaveBeenCalledTimes(2);
+  });
+
+  it("Close leaves the wizard for Home", async () => {
+    mockCreation(async () => {
+      throw new VaultCreationError("fund", "Couldn't reach Friendbot to fund the vault.");
+    });
+    await renderCreate();
+    await fireEvent.press(await screen.findByRole("button", { name: "Close" }));
+    expect(router.dismissTo).toHaveBeenCalledWith("/");
   });
 
   it("never starts for a setup whose warnings weren't confirmed", async () => {
