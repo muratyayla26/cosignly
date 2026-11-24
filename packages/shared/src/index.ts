@@ -21,3 +21,5 @@ export * from "./horizon/activity";
 export * from "./vault/setup";
 export * from "./vault/create";
 export * from "./tx/decode";
+export * from "./coordinator/refractor";
+export * from "./proposal/payment";
