@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { router } from "expo-router";
 import type { ReactElement, useEffect } from "react";
@@ -5,6 +6,8 @@ import { AppState } from "react-native";
 
 import HomeScreen from "@/app/index";
 import VaultScreen from "@/app/vault/[id]";
+import { coordinator } from "@/lib/stellar";
+import { saveLocalProposal } from "@/proposals/store";
 import { useSigner } from "@/signer";
 import { ThemeProvider } from "@/theme";
 
@@ -37,6 +40,7 @@ jest.mock("@/lib/stellar", () => {
       network,
       fetch: (url: string) => mockFetch(url),
     }),
+    coordinator: { propose: jest.fn(), addSignature: jest.fn(), getStatus: jest.fn() },
   };
 });
 
@@ -59,7 +63,8 @@ async function renderScreen(ui: ReactElement) {
   return await render(<ThemeProvider initialPreference="light">{ui}</ThemeProvider>);
 }
 
-beforeEach(() => {
+beforeEach(async () => {
+  await AsyncStorage.clear();
   jest.clearAllMocks();
   jest.mocked(useSigner).mockReturnValue({
     state: { status: "ready", publicKey: ALEX },
@@ -134,6 +139,38 @@ describe("Vault detail", () => {
     expect(screen.getAllByText("Added or updated a signer")).toHaveLength(3);
     // A healthy 2-of-3 setup has no warnings.
     expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("offers to propose a payment, or shows the one waiting for approval", async () => {
+    const first = await renderScreen(<VaultScreen />);
+    await fireEvent.press(await screen.findByRole("button", { name: "Propose payment" }));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: "/propose/[vaultId]",
+      params: { vaultId: VAULT },
+    });
+    await first.unmount();
+
+    const hash = "ef".repeat(32);
+    await saveLocalProposal({
+      vaultId: VAULT,
+      hash,
+      title: "Send 25 XLM to Sam",
+      sequence: (BigInt(vaultAccount.sequence) + 1n).toString(),
+      createdAt: new Date().toISOString(),
+    });
+    jest.mocked(coordinator.getStatus).mockResolvedValue({
+      network: "testnet",
+      hash,
+      state: "collecting",
+      xdr: "",
+      signedBy: [ALEX],
+    });
+    await renderScreen(<VaultScreen />);
+    expect(await screen.findByText("Send 25 XLM to Sam")).toBeTruthy();
+    expect(screen.getByLabelText("1 of 2 approvals")).toBeTruthy();
+    expect(screen.getByText("Waiting for approvals")).toBeTruthy();
+    // One pending proposal per vault: no second "Propose payment".
+    expect(screen.queryByRole("button", { name: "Propose payment" })).toBeNull();
   });
 
   it("explains a vault removed by a testnet reset", async () => {
