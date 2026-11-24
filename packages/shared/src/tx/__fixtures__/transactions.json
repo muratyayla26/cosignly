@@ -1,0 +1,66 @@
+{
+  "created": "2026-11-22",
+  "accounts": {
+    "alex": "GCD6DE2NDPNT3PFH4O4RSYOQKFASZGAB2I44FZC4IXTZDHIJDUU7CQJV",
+    "sam": "GCBZ764NA7II5VL2I5P76BZQWROSH7MBH4DYPMBIC4UMU4YIRUTDS235",
+    "newAccount": "GDQF3PYA34RA6K5ATEUV4YEL6ZTUC5UUHH67C3IAHEWLMOQDT53WBF43"
+  },
+  "transactions": [
+    {
+      "id": "payment-xlm",
+      "description": "Alex pays Sam 25.5 XLM with a text memo; valid for 7 days",
+      "submitted": true,
+      "hash": "d3a91e274c641ae0cb974c4032c7b807c505beeca9ed9be56c53423ef40303a1",
+      "envelope_xdr": "AAAAAgAAAACH4ZNNG9s9vKfjuRlh0FFBLJgB0jnC5FxF55GdCR0p8QAAA+gAWZW7AAAAAQAAAAEAAAAAAAAAAAAAAABrDIkIAAAAAQAAAApSZW50IE1hcmNoAAAAAAABAAAAAAAAAAEAAAAAg5/7jQfQjtV6R1//BzC0XSP9gT8Hh7AoFyjKcwiNJjkAAAAAAAAAAA8y/cAAAAAAAAAAAQkdKfEAAABAHejs8YYmJ/F8uWqFdIXUlWH9y5gC9TXAEi5W89AbPVDtwwHmV1/zHxOcORAwXRI4NMCpXmMKBgZ6IUR6rolEAg=="
+    },
+    {
+      "id": "create-account",
+      "description": "Alex creates a new account with 5 XLM",
+      "submitted": true,
+      "hash": "99390878af9c9d3176bf7764ccf15fdc9e9d0426d778014756cd1deff2364cda",
+      "envelope_xdr": "AAAAAgAAAACH4ZNNG9s9vKfjuRlh0FFBLJgB0jnC5FxF55GdCR0p8QAAA+gAWZW7AAAAAgAAAAEAAAAAAAAAAAAAAABrA0+3AAAAAAAAAAEAAAAAAAAAAAAAAADgXb8A3yIPK6CZKV5gi/ZnQXaUOf3xbQA5LLY6A593YAAAAAAC+vCAAAAAAAAAAAEJHSnxAAAAQPrRytbWkVrEkWP8o8T203dipymstWXKfQDDAsbTRXW929YJbfdwVAaaHF6pS35iDBRm7embS0DSTWOuPJCBlAc="
+    },
+    {
+      "id": "change-trust-add",
+      "description": "Sam adds a USDC trustline",
+      "submitted": true,
+      "hash": "9bbbf703ec5a7276d2f5ecc73d6eef43e21b97e66fd8913fb4fc77deb7bf1a7e",
+      "envelope_xdr": "AAAAAgAAAACDn/uNB9CO1XpHX/8HMLRdI/2BPweHsCgXKMpzCI0mOQAAA+gAWZW8AAAAAQAAAAEAAAAAAAAAAAAAAABrA0+9AAAAAAAAAAEAAAAAAAAABgAAAAFVU0RDAAAAAEI+fQXy7K+/7BkrIVo/G+lq7bjY5wJUq+NBPgIH3layf/////////8AAAAAAAAAAQiNJjkAAABAH/Ms1yW5kqzVMgg/kNWjuY+bHJuuHCMUcm2OvvwH4FqkLDDyeo0p0KfNPBakvmN8CGVux1XvCgrTd+5zZppfDw=="
+    },
+    {
+      "id": "change-trust-remove",
+      "description": "Sam removes the USDC trustline (limit 0)",
+      "submitted": true,
+      "hash": "77a427cdcfa61bff53793e3ea51d4c39e86dd75d6530156e95e06137e663b804",
+      "envelope_xdr": "AAAAAgAAAACDn/uNB9CO1XpHX/8HMLRdI/2BPweHsCgXKMpzCI0mOQAAA+gAWZW8AAAAAgAAAAEAAAAAAAAAAAAAAABrA0/BAAAAAAAAAAEAAAAAAAAABgAAAAFVU0RDAAAAAEI+fQXy7K+/7BkrIVo/G+lq7bjY5wJUq+NBPgIH3layAAAAAAAAAAAAAAAAAAAAAQiNJjkAAABACzBmp3zAJ54f3DnKrbshqHEmkHSm9KrBWVmUT/XjI8iTKmHzEzUSrBaYVCveYXlYxhzozL5PJkiKoBN360tnAw=="
+    },
+    {
+      "id": "set-options-add-signer",
+      "description": "Alex adds Sam as a signer (weight 1) and sets thresholds 1/2/2",
+      "submitted": true,
+      "hash": "813138488abc3c59edc9567f48cbc5211c6be7cc7814a312a0bbdd91756a2c5f",
+      "envelope_xdr": "AAAAAgAAAACH4ZNNG9s9vKfjuRlh0FFBLJgB0jnC5FxF55GdCR0p8QAAB9AAWZW7AAAAAwAAAAEAAAAAAAAAAAAAAABrA0/GAAAAAAAAAAIAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAACDn/uNB9CO1XpHX/8HMLRdI/2BPweHsCgXKMpzCI0mOQAAAAEAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQAAAAEAAAACAAAAAQAAAAIAAAAAAAAAAAAAAAAAAAABCR0p8QAAAED/bgujrovyK/2Efj4K4QfUJK5lefkdKecWplBpfmXBrEjG1qzdGTVFy1RaXZxr2j68y0vt7NeHImc645rwQGMJ"
+    },
+    {
+      "id": "set-options-remove-signer",
+      "description": "Alex removes Sam as a signer and resets thresholds (signed by both)",
+      "submitted": true,
+      "hash": "0565d9896b8b64bfb427e2e383408d8c83497d177cf2c6df68d08e4fcb0fad9a",
+      "envelope_xdr": "AAAAAgAAAACH4ZNNG9s9vKfjuRlh0FFBLJgB0jnC5FxF55GdCR0p8QAAB9AAWZW7AAAABAAAAAEAAAAAAAAAAAAAAABrA0/LAAAAAAAAAAIAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAACDn/uNB9CO1XpHX/8HMLRdI/2BPweHsCgXKMpzCI0mOQAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAACCR0p8QAAAEBMiaIUfbhKILYIBIOVKitj/czKsOR0QJjqmIX3VJdKFvruCPLTL/ebNEUg6euuA0yaKaU4NmOBAYB/0JrS+jYACI0mOQAAAECeyxMJ+vdf3PM0fuEfkUbFDOQ4TCijAvBrLUtRhV8T/cgOxdVvoQYvnC4oVz2UX/aphiVveEueo1p37Ot5nPoM"
+    },
+    {
+      "id": "mixed-unknown",
+      "description": "Payment plus a manage_data operation Cosignly doesn't recognize",
+      "submitted": true,
+      "hash": "787512a0c7b8ed930e5d95c96ea669587d6b432379bfa933884f62099bf7dcdc",
+      "envelope_xdr": "AAAAAgAAAACH4ZNNG9s9vKfjuRlh0FFBLJgB0jnC5FxF55GdCR0p8QAAB9AAWZW7AAAABQAAAAEAAAAAAAAAAAAAAABrA0/QAAAAAgAAAAAAAAAqAAAAAgAAAAAAAAABAAAAAIOf+40H0I7Vekdf/wcwtF0j/YE/B4ewKBcoynMIjSY5AAAAAAAAAAAAmJaAAAAAAAAAAAoAAAAEbm90ZQAAAAEAAAAFaGVsbG8AAAAAAAAAAAAAAQkdKfEAAABAMaNcofWLN0BROs+mTb1P6IWeJY7E4QnCggwYgPCHp0Ijf4XIey0aXC1pyxrQt7LcAmSq9eT251xKXyhJYKLABg=="
+    },
+    {
+      "id": "payment-usdc-unsubmitted",
+      "description": "Alex proposes 500 USDC to Sam with a 7-day window (built and signed, not submitted: no testnet USDC without the captcha faucet)",
+      "submitted": false,
+      "hash": "5ce0c19bec26de96dc106f0ba6fc49a1c2f4521aeaed9a22a0936085aa8a8930",
+      "envelope_xdr": "AAAAAgAAAACH4ZNNG9s9vKfjuRlh0FFBLJgB0jnC5FxF55GdCR0p8QAAA+gAWZW7AAAABgAAAAEAAAAAAAAAAAAAAABrDIkqAAAAAAAAAAEAAAAAAAAAAQAAAACDn/uNB9CO1XpHX/8HMLRdI/2BPweHsCgXKMpzCI0mOQAAAAFVU0RDAAAAAEI+fQXy7K+/7BkrIVo/G+lq7bjY5wJUq+NBPgIH3layAAAAASoF8gAAAAAAAAAAAQkdKfEAAABATkMY1FK1aiVR6ruUwTc50t6g1Vm+HCNjf6thE5cpBgoD4ukuyIb0REnkqEeSZSsXxGv/W/UlEL7/7JoLWmUNDQ=="
+    }
+  ]
+}
