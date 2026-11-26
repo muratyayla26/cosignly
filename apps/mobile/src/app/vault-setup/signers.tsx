@@ -121,5 +121,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  actions: { flexDirection: "row", flexWrap: "wrap", gap: space.xs },
+  actions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    columnGap: space.lg,
+    rowGap: space.xs,
+  },
 });

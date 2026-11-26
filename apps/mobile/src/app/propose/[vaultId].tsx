@@ -348,12 +348,7 @@ function Form({
         autoComplete="off"
         spellCheck={false}
       />
-      <Button
-        label="Paste address"
-        icon={ClipboardPaste}
-        variant="ghost"
-        onPress={() => void paste()}
-      />
+      <Button label="Paste" icon={ClipboardPaste} variant="ghost" onPress={() => void paste()} />
       <TextField
         label={`Amount (${draft.asset})`}
         value={draft.amount}
