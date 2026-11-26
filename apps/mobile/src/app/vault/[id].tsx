@@ -1,14 +1,16 @@
 import {
+  approvalProgress,
   assetCode,
   explorerAccountUrl,
   explorerTransactionUrl,
   formatAmount,
+  refractorTxUrl,
   xlmReserve,
   type ActivityKind,
   type VaultActivity,
 } from "@cosignly/shared";
 import * as Linking from "expo-linking";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useFocusEffect, useLocalSearchParams } from "expo-router";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -16,10 +18,11 @@ import {
   ExternalLink,
   KeyRound,
   Plus,
+  Send,
   ShieldCheck,
   type LucideIcon,
 } from "lucide-react-native";
-import { useCallback, type ReactNode } from "react";
+import { useCallback, useRef, type ReactNode } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -37,9 +40,11 @@ import {
   Card,
   Icon,
   Text,
+  QuorumProgress,
   ThresholdSummary,
 } from "@/components";
-import { network } from "@/lib/stellar";
+import { coordinator, network } from "@/lib/stellar";
+import { loadPendingProposal, removeLocalProposal, type PendingProposal } from "@/proposals/store";
 import { timeAgo } from "@/lib/time";
 import { useRemoteData } from "@/lib/useRemoteData";
 import { useSigner } from "@/signer";
@@ -54,6 +59,15 @@ export default function VaultScreen() {
   const load = useCallback((signal: AbortSignal) => loadVaultDetail(id, signal), [id]);
   const detail = useRemoteData(load);
   const { names } = useVaultNames();
+  // Reload when coming back (e.g. after proposing a payment); the first focus is the initial load.
+  const focused = useRef(false);
+  const { reload } = detail;
+  useFocusEffect(
+    useCallback(() => {
+      if (focused.current) void reload();
+      focused.current = true;
+    }, [reload]),
+  );
 
   return (
     <ScrollView
@@ -107,9 +121,31 @@ function VaultBody({ data }: { data: VaultDetail }) {
   const { vault, account, activity } = data;
   const reserve = xlmReserve(account);
   const equalWeights = vault.signers.every((s) => s.weight === vault.signers[0]?.weight);
+  const isSigner = vault.signers.some((s) => s.key === me);
+  const loadPending = useCallback(() => loadPendingProposal(account, coordinator), [account]);
+  const pending = useRemoteData(loadPending);
+  const pendingProposal = pending.state.kind === "ready" ? pending.state.data : null;
 
   return (
     <>
+      {pendingProposal ? (
+        <PendingCard
+          pending={pendingProposal}
+          vault={vault}
+          onDismiss={() => void removeLocalProposal(vault.accountId).then(() => pending.reload())}
+        />
+      ) : null}
+      {isSigner && !pendingProposal?.open ? (
+        <Button
+          label="Propose payment"
+          icon={Send}
+          fullWidth
+          onPress={() =>
+            router.push({ pathname: "/propose/[vaultId]", params: { vaultId: vault.accountId } })
+          }
+        />
+      ) : null}
+
       <Section title="Balances">
         <Card>
           {sortedBalances(account.balances).map((b) => (
@@ -175,6 +211,58 @@ function VaultBody({ data }: { data: VaultDetail }) {
         onPress={() => void Linking.openURL(explorerAccountUrl(network, account.id))}
       />
     </>
+  );
+}
+
+/** This phone's proposal for the vault: approvals so far and where it stands. */
+function PendingCard({
+  pending,
+  vault,
+  onDismiss,
+}: {
+  pending: PendingProposal;
+  vault: VaultDetail["vault"];
+  onDismiss: () => void;
+}) {
+  const { local, status, open, stale } = pending;
+  const progress = approvalProgress(vault, status.signedBy);
+  const expires = status.maxTime?.toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+  const line = stale
+    ? "Can't be sent anymore: another transaction from this vault went first."
+    : status.state === "collecting"
+      ? `Waiting for approvals${expires ? ` · expires ${expires}` : ""}`
+      : status.state === "ready"
+        ? "Approved. Sending to Stellar…"
+        : status.state === "submitted"
+          ? "Sent."
+          : status.state === "expired"
+            ? "Expired before enough signers approved."
+            : `Failed${status.error ? `: ${status.error}` : "."}`;
+
+  return (
+    <Section title="Proposed payment">
+      <Card>
+        <Text variant="bodyStrong">{local.title}</Text>
+        <QuorumProgress approvals={progress.approvals} required={progress.required} />
+        <Text
+          variant="callout"
+          color={open || status.state === "submitted" ? "textMuted" : "warning"}
+        >
+          {line}
+        </Text>
+        <Button
+          label="View on Refractor"
+          icon={ExternalLink}
+          variant="secondary"
+          fullWidth
+          onPress={() => void Linking.openURL(refractorTxUrl(local.hash))}
+        />
+        {open ? null : <Button label="Dismiss" variant="ghost" fullWidth onPress={onDismiss} />}
+      </Card>
+    </Section>
   );
 }
 

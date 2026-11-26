@@ -44,8 +44,12 @@ export interface AddSignatureInput {
 /**
  * Coordinator-level state. The app maps this to the user-facing proposal
  * lifecycle (pending → submitted → executed / failed / expired / stale) in W3.5.
- * Refractor's own status values are undocumented; the mapping is defined when
- * `RefractorCoordinator` is implemented.
+ * - `collecting`: waiting for more signatures.
+ * - `ready`: enough signatures; being submitted to the network.
+ * - `submitted`: applied on the network.
+ * - `failed`: the network rejected it (see `error`).
+ * - `expired`: its time bounds passed before it was submitted.
+ * For Refractor's own status values see `refractor.ts`.
  */
 export type CoordinatorState = "collecting" | "ready" | "submitted" | "failed" | "expired";
 
@@ -58,4 +62,6 @@ export interface CoordinatorStatus extends ProposalRef {
   /** Validity window of the transaction (time bounds), when set. */
   minTime?: Date;
   maxTime?: Date;
+  /** Why it failed, as reported by the coordinator (e.g. "Tx error: txBadSeq"). */
+  error?: string;
 }

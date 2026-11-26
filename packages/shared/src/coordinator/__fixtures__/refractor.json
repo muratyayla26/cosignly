@@ -1,0 +1,165 @@
+{
+  "_note": "Real Refractor API responses (api.refractor.space, testnet, 2026-11-24). Throw-away 2-of-2 account GCIA...747D paying 10 XLM. In the pending/ready snapshots the xdr field (truncated by the probe log) was replaced with the final envelope of the same transaction.",
+  "notFound": {
+    "error": "Transaction fc749b4affc10eeacff46d0117926c18194c6700bf3ddfa2612b7a50aa097796 not found.",
+    "status": 404
+  },
+  "postFirstSignature": {
+    "hash": "fc749b4affc10eeacff46d0117926c18194c6700bf3ddfa2612b7a50aa097796",
+    "signatures": [
+      {
+        "key": "GCABJ3GFP7O4BGHSVSZPSLIFTL2JII7SUYRPOJFTX3MEUVHLQ6KQKIGG",
+        "signature": "aXOYOYsASRGFS0ASlGPOhHBHNfGj381Jt5mATqiOTlU0jdEd62BoH3RNtEzBYcpCWrpfFhwXsefwzSB4U0+wCQ=="
+      }
+    ],
+    "submit": true,
+    "minTime": 0,
+    "maxTime": 1796152103,
+    "status": "pending",
+    "network": "testnet",
+    "xdr": "AAAAAgAAAACQDlK1tSkHk+bnZQUznVDeJgBo5ax9SxsjkUy721mAbwAAA+gAWhlaAAAAAgAAAAEAAAAAAAAAAAAAAABrDxsnAAAAAAAAAAEAAAAAAAAAAQAAAAAVvGBM9EF7O0mQW2q7wt9EVAYaenJMC1U9gEwe+PJsaQAAAAAAAAAABfXhAAAAAAAAAAAC64eVBQAAAEBpc5g5iwBJEYVLQBKUY86EcEc18aPfzUm3mYBOqI5OVTSN0R3rYGgfdE20TMFhykJaul8WHBex5/DNIHhTT7AJM3fLKwAAAEA8GNPLSH1/IlOzP1PPQJnRSt/C453tWVl8CMkK3EZt5HCrXKewYEfe40wbB1pNs886JRKgya7VcazSe76ptdcD",
+    "changes": {
+      "accepted": [
+        {
+          "key": "GCABJ3GFP7O4BGHSVSZPSLIFTL2JII7SUYRPOJFTX3MEUVHLQ6KQKIGG",
+          "signature": "aXOYOYsASRGFS0ASlGPOhHBHNfGj381Jt5mATqiOTlU0jdEd62BoH3RNtEzBYcpCWrpfFhwXsefwzSB4U0+wCQ=="
+        }
+      ],
+      "rejected": []
+    }
+  },
+  "getPending": {
+    "callbackUrl": null,
+    "desiredSigners": null,
+    "error": null,
+    "maxTime": 1796152103,
+    "minTime": 0,
+    "signatures": [
+      {
+        "key": "GCABJ3GFP7O4BGHSVSZPSLIFTL2JII7SUYRPOJFTX3MEUVHLQ6KQKIGG",
+        "signature": "aXOYOYsASRGFS0ASlGPOhHBHNfGj381Jt5mATqiOTlU0jdEd62BoH3RNtEzBYcpCWrpfFhwXsefwzSB4U0+wCQ=="
+      }
+    ],
+    "status": "pending",
+    "submit": true,
+    "submitted": null,
+    "updated": null,
+    "hash": "fc749b4affc10eeacff46d0117926c18194c6700bf3ddfa2612b7a50aa097796",
+    "network": "testnet",
+    "xdr": "AAAAAgAAAACQDlK1tSkHk+bnZQUznVDeJgBo5ax9SxsjkUy721mAbwAAA+gAWhlaAAAAAgAAAAEAAAAAAAAAAAAAAABrDxsnAAAAAAAAAAEAAAAAAAAAAQAAAAAVvGBM9EF7O0mQW2q7wt9EVAYaenJMC1U9gEwe+PJsaQAAAAAAAAAABfXhAAAAAAAAAAAC64eVBQAAAEBpc5g5iwBJEYVLQBKUY86EcEc18aPfzUm3mYBOqI5OVTSN0R3rYGgfdE20TMFhykJaul8WHBex5/DNIHhTT7AJM3fLKwAAAEA8GNPLSH1/IlOzP1PPQJnRSt/C453tWVl8CMkK3EZt5HCrXKewYEfe40wbB1pNs886JRKgya7VcazSe76ptdcD"
+  },
+  "postStrangerSignature": {
+    "callbackUrl": null,
+    "desiredSigners": null,
+    "error": null,
+    "maxTime": 1796152103,
+    "minTime": 0,
+    "signatures": [
+      {
+        "key": "GCABJ3GFP7O4BGHSVSZPSLIFTL2JII7SUYRPOJFTX3MEUVHLQ6KQKIGG",
+        "signature": "aXOYOYsASRGFS0ASlGPOhHBHNfGj381Jt5mATqiOTlU0jdEd62BoH3RNtEzBYcpCWrpfFhwXsefwzSB4U0+wCQ=="
+      }
+    ],
+    "status": "pending",
+    "submit": true,
+    "submitted": null,
+    "updated": null,
+    "hash": "fc749b4affc10eeacff46d0117926c18194c6700bf3ddfa2612b7a50aa097796",
+    "network": "testnet",
+    "xdr": "AAAAAgAAAACQDlK1tSkHk+bnZQUznVDeJgBo5ax9SxsjkUy721mAbwAAA+gAWhlaAAAAAgAAAAEAAAAAAAAAAAAAAABrDxsnAAAAAAAAAAEAAAAAAAAAAQAAAAAVvGBM9EF7O0mQW2q7wt9EVAYaenJMC1U9gEwe+PJsaQAAAAAAAAAABfXhAAAAAAAAAAAC64eVBQAAAEBpc5g5iwBJEYVLQBKUY86EcEc18aPfzUm3mYBOqI5OVTSN0R3rYGgfdE20TMFhykJaul8WHBex5/DNIHhTT7AJM3fLKwAAAEA8GNPLSH1/IlOzP1PPQJnRSt/C453tWVl8CMkK3EZt5HCrXKewYEfe40wbB1pNs886JRKgya7VcazSe76ptdcD",
+    "changes": {
+      "accepted": [],
+      "rejected": [
+        {
+          "key": "G______________________________________________BVY2O____",
+          "signature": "+BF/2YjhLgjJrjDNqm2bqsggMjEE8rnaO0rotz/KwPam7OjSnnjPy8ocpgm0brRGkyHdC0mDErFRADBG5lfuCA=="
+        }
+      ]
+    }
+  },
+  "postSecondSignature": {
+    "callbackUrl": null,
+    "desiredSigners": null,
+    "error": null,
+    "maxTime": 1796152103,
+    "minTime": 0,
+    "signatures": [
+      {
+        "key": "GCABJ3GFP7O4BGHSVSZPSLIFTL2JII7SUYRPOJFTX3MEUVHLQ6KQKIGG",
+        "signature": "aXOYOYsASRGFS0ASlGPOhHBHNfGj381Jt5mATqiOTlU0jdEd62BoH3RNtEzBYcpCWrpfFhwXsefwzSB4U0+wCQ=="
+      },
+      {
+        "key": "GAXFKTR5H4YIWOGWKOCBQWSVM5YVJFO4WKMTE4VQAYCUK6ZTO7FSW6J5",
+        "signature": "PBjTy0h9fyJTsz9Tz0CZ0UrfwuOd7VlZfAjJCtxGbeRwq1ynsGBH3uNMGwdaTbPPOiUSoMmu1XGs0nu+qbXXAw=="
+      }
+    ],
+    "status": "ready",
+    "submit": true,
+    "submitted": null,
+    "updated": null,
+    "hash": "fc749b4affc10eeacff46d0117926c18194c6700bf3ddfa2612b7a50aa097796",
+    "network": "testnet",
+    "xdr": "AAAAAgAAAACQDlK1tSkHk+bnZQUznVDeJgBo5ax9SxsjkUy721mAbwAAA+gAWhlaAAAAAgAAAAEAAAAAAAAAAAAAAABrDxsnAAAAAAAAAAEAAAAAAAAAAQAAAAAVvGBM9EF7O0mQW2q7wt9EVAYaenJMC1U9gEwe+PJsaQAAAAAAAAAABfXhAAAAAAAAAAAC64eVBQAAAEBpc5g5iwBJEYVLQBKUY86EcEc18aPfzUm3mYBOqI5OVTSN0R3rYGgfdE20TMFhykJaul8WHBex5/DNIHhTT7AJM3fLKwAAAEA8GNPLSH1/IlOzP1PPQJnRSt/C453tWVl8CMkK3EZt5HCrXKewYEfe40wbB1pNs886JRKgya7VcazSe76ptdcD",
+    "changes": {
+      "accepted": [
+        {
+          "key": "GAXFKTR5H4YIWOGWKOCBQWSVM5YVJFO4WKMTE4VQAYCUK6ZTO7FSW6J5",
+          "signature": "PBjTy0h9fyJTsz9Tz0CZ0UrfwuOd7VlZfAjJCtxGbeRwq1ynsGBH3uNMGwdaTbPPOiUSoMmu1XGs0nu+qbXXAw=="
+        }
+      ],
+      "rejected": []
+    }
+  },
+  "getProcessed": {
+    "callbackUrl": null,
+    "desiredSigners": null,
+    "error": null,
+    "maxTime": 1796152103,
+    "minTime": 0,
+    "signatures": [
+      {
+        "key": "GCABJ3GFP7O4BGHSVSZPSLIFTL2JII7SUYRPOJFTX3MEUVHLQ6KQKIGG",
+        "signature": "aXOYOYsASRGFS0ASlGPOhHBHNfGj381Jt5mATqiOTlU0jdEd62BoH3RNtEzBYcpCWrpfFhwXsefwzSB4U0+wCQ=="
+      },
+      {
+        "key": "GAXFKTR5H4YIWOGWKOCBQWSVM5YVJFO4WKMTE4VQAYCUK6ZTO7FSW6J5",
+        "signature": "PBjTy0h9fyJTsz9Tz0CZ0UrfwuOd7VlZfAjJCtxGbeRwq1ynsGBH3uNMGwdaTbPPOiUSoMmu1XGs0nu+qbXXAw=="
+      }
+    ],
+    "status": "processed",
+    "submit": true,
+    "submitted": 1795547314,
+    "updated": 1795547314,
+    "hash": "fc749b4affc10eeacff46d0117926c18194c6700bf3ddfa2612b7a50aa097796",
+    "network": "testnet",
+    "xdr": "AAAAAgAAAACQDlK1tSkHk+bnZQUznVDeJgBo5ax9SxsjkUy721mAbwAAA+gAWhlaAAAAAgAAAAEAAAAAAAAAAAAAAABrDxsnAAAAAAAAAAEAAAAAAAAAAQAAAAAVvGBM9EF7O0mQW2q7wt9EVAYaenJMC1U9gEwe+PJsaQAAAAAAAAAABfXhAAAAAAAAAAAC64eVBQAAAEBpc5g5iwBJEYVLQBKUY86EcEc18aPfzUm3mYBOqI5OVTSN0R3rYGgfdE20TMFhykJaul8WHBex5/DNIHhTT7AJM3fLKwAAAEA8GNPLSH1/IlOzP1PPQJnRSt/C453tWVl8CMkK3EZt5HCrXKewYEfe40wbB1pNs886JRKgya7VcazSe76ptdcD"
+  },
+  "getFailed": {
+    "callbackUrl": null,
+    "desiredSigners": null,
+    "error": "Tx error: txBadSeq",
+    "maxTime": 1795550991,
+    "minTime": 0,
+    "signatures": [
+      {
+        "key": "GANSNNSGX5IBHCFDLOCAK7HLNWIF3SYDA5XCTGSJ5RQE6K63KXKL7QN6",
+        "signature": "QhIAv6NEIVseDqAcctjnpyLq8SeyIi4bEecX4MnNt5nxSk7rYlYjTsZ2sZ+5SK+6gDTbmBSpRnsPmpDtoY7fDw=="
+      }
+    ],
+    "status": "failed",
+    "submit": true,
+    "submitted": null,
+    "updated": 1795547404,
+    "hash": "d50e436b0dc92cd7f8d27283154c8982410981996f4886be15415226dd8a5cd3",
+    "network": "testnet",
+    "xdr": "AAAAAgAAAAAbJrZGv1ATiKNbhAV8622QXcsDB24pmknsYE8r21XUvwAAA+gAWhlsAAAAAQAAAAEAAAAAAAAAAAAAAABrBe8PAAAAAAAAAAEAAAAAAAAAAQAAAAAWq4CbDzgdUzscfoRTdojnKQ2uKP4sNbyqz7nU5h+DowAAAAAAAAAAATEtAAAAAAAAAAAB21XUvwAAAEBCEgC/o0QhWx4OoBxy2OenIurxJ7IiLhsR5xfgyc23mfFKTutiViNOxnaxn7lIr7qANNuYFKlGew+akO2hjt8P"
+  },
+  "postInvalidXdr": {
+    "error": "Invalid transaction XDR",
+    "status": 400
+  },
+  "postExpired": {
+    "error": "Invalid transactions \"timebounds.maxTime\" value - the transaction already expired.",
+    "status": 400
+  }
+}

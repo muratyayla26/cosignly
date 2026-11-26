@@ -55,6 +55,9 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         fullWidth && styles.fullWidth,
+        // A ghost button has no visible edge, so its icon/label lines up with the
+        // content edge (inputs above it) instead of sitting inside invisible padding.
+        variant === "ghost" && !fullWidth && styles.flush,
         {
           backgroundColor: v.bg ? colors[v.bg] : "transparent",
           borderColor: v.border ? colors[v.border] : "transparent",
@@ -88,5 +91,6 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   fullWidth: { alignSelf: "stretch" },
+  flush: { paddingHorizontal: 0, minWidth: minTouchTarget },
   content: { flexDirection: "row", alignItems: "center", gap: space.xs },
 });
