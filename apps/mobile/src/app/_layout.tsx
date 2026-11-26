@@ -58,6 +58,8 @@ function RootStack() {
         <Stack.Screen name="vault/[id]" options={{ title: "Vault" }} />
         <Stack.Screen name="vault-setup" options={{ headerShown: false }} />
         <Stack.Screen name="propose/[vaultId]" options={{ title: "Propose payment" }} />
+        <Stack.Screen name="proposal/[hash]" options={{ title: "Payment" }} />
+        <Stack.Screen name="proposal/open" options={{ title: "Open a proposal" }} />
         <Stack.Screen name="design" options={{ title: "Design preview" }} />
         <Stack.Screen name="onboarding/index" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding/recovery" options={{ title: "" }} />
