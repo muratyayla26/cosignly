@@ -1,6 +1,7 @@
 import {
   decodeTransaction,
   RefractorError,
+  settleWithLedger,
   type AccountInfo,
   type CoordinatorStatus,
 } from "@cosignly/shared";
@@ -14,8 +15,9 @@ export interface ProposalData {
 }
 
 /**
- * A proposal by hash: its latest status from the coordinator and its vault
- * from Horizon. `null` if the coordinator doesn't know the hash.
+ * A proposal by hash: its latest status from the coordinator (corrected by the
+ * ledger when the coordinator lags) and its vault from Horizon. `null` if the
+ * coordinator doesn't know the hash.
  */
 export async function loadProposal(hash: string): Promise<ProposalData | null> {
   let status: CoordinatorStatus;
@@ -27,5 +29,9 @@ export async function loadProposal(hash: string): Promise<ProposalData | null> {
   }
   const decoded = decodeTransaction(status.xdr, { network, usdc });
   const vault = decoded.ok ? await horizon.getAccount(decoded.tx.source) : null;
+  // Refractor can lag a few seconds behind the ledger; don't mistake that for "stale".
+  if (vault && decoded.ok) {
+    status = await settleWithLedger(status, vault.sequence, decoded.tx.sequence, horizon);
+  }
   return { status, vault };
 }

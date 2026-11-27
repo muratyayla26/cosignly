@@ -1,12 +1,13 @@
 import {
   RefractorError,
+  settleWithLedger,
   type AccountInfo,
   type CoordinatorStatus,
   type SignatureCoordinator,
 } from "@cosignly/shared";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { network } from "@/lib/stellar";
+import { horizon, network } from "@/lib/stellar";
 
 /**
  * Proposals this phone created, one per vault (v1 allows a single pending
@@ -86,6 +87,8 @@ export async function loadPendingProposal(
     }
     throw e;
   }
+  // Refractor can lag a few seconds behind the ledger; don't mistake that for "stale".
+  status = await settleWithLedger(status, vault.sequence, local.sequence, horizon);
   const waiting = status.state === "collecting" || status.state === "ready";
   const stale = waiting && BigInt(vault.sequence) >= BigInt(local.sequence);
   return { local, status, open: waiting && !stale, stale };

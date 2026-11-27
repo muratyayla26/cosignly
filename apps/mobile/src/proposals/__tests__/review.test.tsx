@@ -30,6 +30,8 @@ const JORDAN = "GDCHQZAQROW52J3O7WJUTFQMCB6HB7TJXVV33LPJS5PIHG3X5H55TXR5";
 const HASH = "cd".repeat(32);
 
 let mockVault: unknown = setupAccount;
+/** What Horizon has under /transactions/<hash> (null = not in a ledger). */
+let mockLedgerTx: { successful: boolean } | null = null;
 jest.mock("@/lib/stellar", () => {
   const shared = jest.requireActual("@cosignly/shared");
   const network = shared.getNetworkConfig();
@@ -38,7 +40,16 @@ jest.mock("@/lib/stellar", () => {
     usdc: shared.getUsdc("testnet"),
     horizon: shared.createHorizonClient({
       network,
-      fetch: async () => new Response(JSON.stringify(mockVault), { status: 200 }),
+      fetch: async (url: string) => {
+        if (url.includes("/transactions/")) {
+          return mockLedgerTx
+            ? new Response(
+                JSON.stringify({ hash: url.split("/").pop(), ledger: 1, ...mockLedgerTx }),
+              )
+            : new Response(JSON.stringify({ status: 404 }), { status: 404 });
+        }
+        return new Response(JSON.stringify(mockVault), { status: 200 });
+      },
     }),
     coordinator: { propose: jest.fn(), getStatus: jest.fn(), addSignature: jest.fn() },
   };
@@ -86,6 +97,7 @@ async function renderScreen(ui = <ProposalScreen />) {
 beforeEach(() => {
   jest.clearAllMocks();
   mockVault = setupAccount;
+  mockLedgerTx = null;
   samKey = generateSignerKeypair();
   asSigner(SAM);
   jest.mocked(coordinator.getStatus).mockResolvedValue(status());
@@ -183,6 +195,18 @@ describe("Review and approve", () => {
       pathname: "/propose/[vaultId]",
       params: { vaultId: VAULT },
     });
+  });
+
+  it("Refractor lagging behind the ledger shows Sent, not stale", async () => {
+    // The vault's sequence already moved on while Refractor still says "processing".
+    mockVault = { ...setupAccount, sequence: (BigInt(setupAccount.sequence) + 1n).toString() };
+    mockLedgerTx = { successful: true };
+    jest
+      .mocked(coordinator.getStatus)
+      .mockResolvedValue(status({ state: "ready", signedBy: [ALEX, SAM] }));
+    await renderScreen();
+    expect(await screen.findByText("Sent")).toBeTruthy();
+    expect(screen.queryByText("This payment can't be sent anymore")).toBeNull();
   });
 
   it("warnings must be confirmed before approving", async () => {
