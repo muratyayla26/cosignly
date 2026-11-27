@@ -1,4 +1,5 @@
 import type { CoordinatorStatus } from "../coordinator/types";
+import type { HorizonClient } from "../horizon/client";
 import type { VaultConfig } from "../vault/types";
 import { approvalProgress, type ApprovalProgress } from "./payment";
 
@@ -69,4 +70,31 @@ export function reviewProposal(input: ProposalReviewInput): ProposalReview {
   const canApprove = phase === "collecting" && isSigner && !hasSigned && !progress.complete;
 
   return { phase, progress, isSigner, hasSigned, canApprove, ...(reason ? { reason } : {}) };
+}
+
+/**
+ * Corrects a coordinator status that lags behind the network. Refractor
+ * reports `processing` for a few seconds after the transaction is already in
+ * a ledger, while the vault's sequence number has moved on; without this the
+ * proposal would look stale. If the sequence is used and the coordinator
+ * doesn't say "submitted" yet, the proposal's own hash is looked up on Horizon.
+ * Only if it isn't there did another transaction really go first.
+ */
+export async function settleWithLedger(
+  status: CoordinatorStatus,
+  vaultSequence: string,
+  txSequence: string,
+  horizon: Pick<HorizonClient, "getTransaction">,
+): Promise<CoordinatorStatus> {
+  const waiting = status.state === "collecting" || status.state === "ready";
+  if (!waiting || BigInt(vaultSequence) < BigInt(txSequence)) return status;
+  const onLedger = await horizon.getTransaction(status.hash);
+  if (!onLedger) return status;
+  return onLedger.successful
+    ? { ...status, state: "submitted" }
+    : {
+        ...status,
+        state: "failed",
+        error: status.error ?? "The payment's operations failed on Stellar.",
+      };
 }

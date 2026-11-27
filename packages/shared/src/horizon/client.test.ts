@@ -251,3 +251,27 @@ describe("getActivity", () => {
     ).rejects.toBeInstanceOf(HorizonError);
   });
 });
+
+describe("getTransaction", () => {
+  const HASH = "a8d2412cda1bcdf00bd64c8f4fc3040e3b77a40e3bb9252f5ff21bac67f21449";
+
+  it("returns the ledger transaction, or null when Horizon doesn't have it", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ hash: HASH, successful: true, ledger: 5904805 }), {
+          status: 200,
+        }),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: 404 }), { status: 404 }));
+    const client = createHorizonClient({ network: TESTNET, fetch });
+    expect(await client.getTransaction(HASH.toUpperCase())).toEqual({
+      hash: HASH,
+      successful: true,
+      ledger: 5904805,
+    });
+    expect(fetch.mock.calls[0]?.[0]).toBe(`${TESTNET.horizonUrl}/transactions/${HASH}`);
+    expect(await client.getTransaction(HASH)).toBeNull();
+    await expect(client.getTransaction("nope")).rejects.toThrow(TypeError);
+  });
+});

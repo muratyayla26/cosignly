@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { CoordinatorStatus } from "../coordinator/types";
 import { equalWeightConfig } from "../vault/setup";
-import { reviewProposal, type ProposalReviewInput } from "./review";
+import { reviewProposal, settleWithLedger, type ProposalReviewInput } from "./review";
 
 const ALEX = "GCFA5GKYNJDLCLHLGJMYKBASQ2JNN43T67MS6GALL6CGKEPMSELOORJ7";
 const SAM = "GDGKPPMM5BORTIJLY2IC2OCU33OACYDRHMOUJAFRXHY4GTYOJD2QT4CY";
@@ -86,5 +86,48 @@ describe("reviewProposal", () => {
     expect(
       reviewProposal(input({ vaultSequence: "101", status: status({ state: "submitted" }) })).phase,
     ).toBe("executed");
+  });
+});
+
+describe("settleWithLedger", () => {
+  const ledger = (found: { successful: boolean } | null) => ({
+    getTransaction: vi.fn(async (hash: string) => (found ? { hash, ledger: 1, ...found } : null)),
+  });
+
+  it("Refractor still says processing, but the payment is on the ledger → executed, not stale", async () => {
+    // Observed on testnet: the vault's sequence moves on ~seconds before Refractor says processed.
+    const horizon = ledger({ successful: true });
+    const lagging = status({ state: "ready", signedBy: [ALEX, SAM] });
+    const settled = await settleWithLedger(lagging, "101", "101", horizon);
+    expect(settled.state).toBe("submitted");
+    expect(horizon.getTransaction).toHaveBeenCalledWith(lagging.hash);
+    expect(reviewProposal(input({ vaultSequence: "101", status: settled })).phase).toBe("executed");
+  });
+
+  it("not on the ledger → another transaction went first (stale)", async () => {
+    const settled = await settleWithLedger(status(), "101", "101", ledger(null));
+    expect(reviewProposal(input({ vaultSequence: "101", status: settled })).phase).toBe("stale");
+  });
+
+  it("applied but its operations failed → failed", async () => {
+    const settled = await settleWithLedger(
+      status({ state: "ready" }),
+      "101",
+      "101",
+      ledger({ successful: false }),
+    );
+    expect(settled).toMatchObject({
+      state: "failed",
+      error: "The payment's operations failed on Stellar.",
+    });
+  });
+
+  it("doesn't ask Horizon when the sequence is unused or the state is final", async () => {
+    const horizon = ledger({ successful: true });
+    expect(await settleWithLedger(status(), "100", "101", horizon)).toEqual(status());
+    expect(
+      (await settleWithLedger(status({ state: "submitted" }), "101", "101", horizon)).state,
+    ).toBe("submitted");
+    expect(horizon.getTransaction).not.toHaveBeenCalled();
   });
 });

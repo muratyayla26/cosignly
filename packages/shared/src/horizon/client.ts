@@ -125,6 +125,18 @@ export interface HorizonClient {
    * result, so retrying after a network error is safe.
    */
   submitTransaction(xdr: string, options?: RequestOptions): Promise<SubmittedTransaction>;
+  /**
+   * A transaction that is in a ledger, by hash, or `null` if Horizon doesn't
+   * have it. `successful` is false when it was applied but its operations failed
+   * (the fee was still charged and the sequence number used).
+   */
+  getTransaction(hash: string, options?: RequestOptions): Promise<LedgerTransaction | null>;
+}
+
+export interface LedgerTransaction {
+  hash: string;
+  successful: boolean;
+  ledger: number;
 }
 
 export interface ActivityOptions extends RequestOptions {
@@ -229,8 +241,23 @@ export function createHorizonClient({
     return { hash: body.hash, ledger: body.ledger };
   }
 
+  async function getTransaction(hash: string, options?: RequestOptions) {
+    if (!/^[0-9a-f]{64}$/i.test(hash)) throw new TypeError("Not a transaction hash.");
+    try {
+      const body = await getJson<LedgerTransaction>(
+        `${base}/transactions/${hash.toLowerCase()}`,
+        options,
+      );
+      return { hash: body.hash, successful: body.successful, ledger: body.ledger };
+    } catch (e) {
+      if (e instanceof HorizonError && e.status === 404) return null;
+      throw e;
+    }
+  }
+
   return {
     getNetworkStatus,
+    getTransaction,
     getAccount,
     findAccountsBySigner,
     discoverVaults,
