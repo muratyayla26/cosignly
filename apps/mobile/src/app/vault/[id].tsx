@@ -4,7 +4,6 @@ import {
   explorerAccountUrl,
   explorerTransactionUrl,
   formatAmount,
-  refractorTxUrl,
   xlmReserve,
   type ActivityKind,
   type VaultActivity,
@@ -14,6 +13,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from "expo-router
 import {
   ArrowDownLeft,
   ArrowUpRight,
+  ChevronRight,
   CircleDot,
   ExternalLink,
   KeyRound,
@@ -254,11 +254,13 @@ function PendingCard({
           {line}
         </Text>
         <Button
-          label="View on Refractor"
-          icon={ExternalLink}
+          label="Review"
+          icon={ChevronRight}
           variant="secondary"
           fullWidth
-          onPress={() => void Linking.openURL(refractorTxUrl(local.hash))}
+          onPress={() =>
+            router.push({ pathname: "/proposal/[hash]", params: { hash: local.hash } })
+          }
         />
         {open ? null : <Button label="Dismiss" variant="ghost" fullWidth onPress={onDismiss} />}
       </Card>

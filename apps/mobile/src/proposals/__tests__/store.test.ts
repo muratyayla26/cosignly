@@ -7,6 +7,15 @@ import {
 } from "@cosignly/shared";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+let mockLedgerTx: { successful: boolean } | null = null;
+jest.mock("@/lib/stellar", () => ({
+  network: { id: "testnet" },
+  horizon: {
+    getTransaction: async (hash: string) =>
+      mockLedgerTx ? { hash, ledger: 1, ...mockLedgerTx } : null,
+  },
+}));
+
 import setupAccount from "../../../../../packages/shared/src/vault/__fixtures__/setup-account.json";
 import {
   loadLocalProposal,
@@ -45,7 +54,10 @@ const coordinatorReturning = (status: Partial<CoordinatorStatus> | Error) =>
     }),
   }) as unknown as SignatureCoordinator;
 
-beforeEach(() => AsyncStorage.clear());
+beforeEach(async () => {
+  mockLedgerTx = null;
+  await AsyncStorage.clear();
+});
 
 describe("local proposals", () => {
   it("nothing stored → no pending proposal, no network call", async () => {
@@ -68,6 +80,19 @@ describe("local proposals", () => {
     ).toMatchObject({
       open: false,
       stale: true,
+    });
+  });
+
+  it("the sequence moved because this proposal itself executed → submitted, not stale", async () => {
+    await saveLocalProposal(local);
+    mockLedgerTx = { successful: true };
+    const moved = { ...vault, sequence: next };
+    expect(
+      await loadPendingProposal(moved, coordinatorReturning({ state: "ready" })),
+    ).toMatchObject({
+      open: false,
+      stale: false,
+      status: { state: "submitted" },
     });
   });
 

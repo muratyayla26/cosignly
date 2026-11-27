@@ -23,3 +23,6 @@ export * from "./vault/create";
 export * from "./tx/decode";
 export * from "./coordinator/refractor";
 export * from "./proposal/payment";
+export * from "./proposal/link";
+export * from "./proposal/review";
+export * from "./tx/sign";

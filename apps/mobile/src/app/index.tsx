@@ -1,6 +1,6 @@
 import { cryptoSelfCheck } from "@cosignly/shared";
 import { Redirect, router, useFocusEffect } from "expo-router";
-import { Palette, Plus, QrCode as QrCodeIcon, Settings } from "lucide-react-native";
+import { Link2, Palette, Plus, QrCode as QrCodeIcon, Settings } from "lucide-react-native";
 import { useCallback, useMemo, useRef } from "react";
 import {
   ActivityIndicator,
@@ -161,6 +161,13 @@ function VaultList({ publicKey }: { publicKey: string }) {
                 onPress={() => router.push("/vault-setup")}
               />
             ) : null}
+            <Button
+              label="Open a proposal link"
+              icon={Link2}
+              variant="ghost"
+              fullWidth
+              onPress={() => router.push("/proposal/open")}
+            />
             <Text variant="caption" color="textMuted" align="center">
               Stellar {network.label} · updated {timeAgo(vaults.state.updatedAt)}
             </Text>
